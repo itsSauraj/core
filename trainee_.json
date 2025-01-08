@@ -1,0 +1,230 @@
+{
+  "database": {
+    "user": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id" : "UUID",
+      "name": "string",
+      "email": "string",
+      "password": "hashed_password",
+      "role": "emun('admin', 'mentor', 'trainee')",
+      "phone_number": "string",
+      "address": "string",
+      "birthdate": "data / string",
+      "roles": "UUID of Roles",
+      "other_permissions": "LIST[UUID of Permissions]"
+    },
+    "roles": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "title": "string",
+      "permissions": "LIST[UUID of Permissions]"
+    },
+    "permissions": {
+      "id": "UUID",
+      "title": "string",
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date"
+    },
+    "course_collection": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "title": "string",
+      "course": "UUID of Course",
+      "trainee": "UUID of Trainee"
+    },
+    "course": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "title": "string",
+      "description": "string",
+      "estimated_time":"int (time in seconds)",
+      "type": "enum('free', 'paid')"
+    },
+    "module": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "title": "string",
+      "description": "string",
+      "course": "UUID of Course",
+      "module_order": "int"
+    },
+    "lesson": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "title": "string",
+      "description": "string",
+      "duration": "int (time in seconds)",
+      "course": "UUID of Course",
+      "module": "UUID of Module",
+      "lesson_order": "int"
+    },
+    "user_courses_enrolled": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "user": "UUID of User",
+      "course": "UUID of Course",
+      "started_on": "date",
+      "completed_on": "date",
+      "progress": "int (in percentage)",
+      "status": "enum('in_progress', 'completed', 'not_started')"
+    },
+    "user_course_progress": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "user": "UUID of User",
+      "course": "UUID of Course",
+      "module": "UUID of Module",
+      "lesson": "UUID of Lesson",
+      "progress": "int (time in seconds)"
+    },
+    "tickets": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "title": "string",
+      "description": "string",
+      "status": "enum('open', 'closed', 'pending')",
+      "user": "UUID of User" 
+    },
+    "task": {
+      "id": "UUID",
+      "title": "string",
+      "description": "string",
+      "start_at": "date",
+      "duration": "int (time in seconds)",
+      "status": "enum('pending', 'started', 'completed', 'in_complete')",
+      "assigne": "UUID of User",
+      "assigned_to": "UUID of User",
+      "mentor": "UUID of User",
+      "grade":"enum('A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2', 'E1', 'E2', 'F')",
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "attempts": "int", 
+      "max_attempts": "int", 
+      "completed_on": "date", 
+      "failure_reason": "string"
+    },
+    "task_attempts": {
+      "id": "UUID",
+      "task_id": "UUID of Task",
+      "user_id": "UUID of User",
+      "attempt_number": "int",
+      "status": "enum('success', 'failure')",
+      "attempted_on": "date",
+      "failure_reason": "string" 
+    },
+    "feedback": {
+      "created_at": "date",
+      "updated_at": "date",
+      "deleted_at": "date",
+      "id": "UUID",
+      "type":"enum('ticket', 'task')",
+      "task_id": "UUID of Task",
+      "ticket_id": "UUID of Ticket",
+      "title": "string",
+      "description": "string",
+      "grade": "enum('A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2', 'E1', 'E2', 'F')",
+      "user":"UUID of User",
+      "status": "enum('accepted', 'rejected', 'pending')"
+    },
+    "notifications": {
+      "id": "UUID",
+      "user": "UUID of User",
+      "type": "enum('failure', 'success', 'reminder', 'other')",
+      "message": "string",
+      "read_status": "enum('read', 'unread')",
+      "created_at": "date",
+      "updated_at": "date"
+    }
+  },
+
+  "relatoinship":{
+    "user": [
+      {
+        "user_courses_enrolled": [
+          {
+            "course_collection": ["courses"]
+          }
+        ]
+      },
+      "roles" , 
+      {
+        "other_permissions": ["permissions"]
+      }, 
+      "user_course_progress", "tickets", {
+        "task": [
+          "user (assigne)", "user (assigned_to)", "user (mentor)", "feedback"
+        ]
+      }],
+    "roles": ["permissions"],
+    "ticket": ["feedback (type=ticket)"],
+    "task": ["feedback (type=task)"],
+    "course_collection": [{
+      "course": [{
+        "modules": ["lesson"]
+      }]
+    }],
+    "notifications": ["user"],
+    "task_attempts": {
+      "task": ["user"]
+    }
+  },
+
+  "resposes": {
+    "user": {
+      "id": "UUID",
+      "name": "string",
+      "email": "string",
+      "role": "emun('admin', 'mentor', 'trainee')"
+    },
+    "course": [
+      {
+        "id": "UUID",
+        "title": "string",
+        "description": "string",
+        "estimated_time": "int (time in seconds)",
+        "started_on": "date",
+        "completed_on": "date",
+        "progress": "int (in percentage)",
+        "status": "enum('in_progress', 'completed', 'not_started')",
+        "moudles": [
+          {
+            "module_id": "UUID",
+            "title": "string",
+            "description": "string",
+            "progress": "int (in percentage)",
+            "status":"enum('in_progress', 'completed', 'not_started')",
+            "lessons": [
+              {
+                "lesson_id": "UUID",
+                "title": "string",
+                "description": "string",
+                "duration": "int (time in seconds)",
+                "status": "enum('in_progress', 'completed', 'pending')"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
