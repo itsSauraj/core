@@ -22,3 +22,6 @@ class User(AbstractUser):
     if not self.pk:  # Check if the user is being created
       self.set_password(self.password)  # Hash the password
     super(User, self).save(*args, **kwargs)
+
+  def get_permissions(self):
+    return self.get_all_permissions()

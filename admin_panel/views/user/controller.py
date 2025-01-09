@@ -40,7 +40,7 @@ class UserAPIView(APIView):
     permissions = created_user.get_all_permissions()
 
     context = {
-      "username": str(serializer.data.get('username')),
+      "username": user_serializer.data,
       "token": str(token),
       "permissions": permissions
     }
@@ -90,16 +90,12 @@ class MemberAPIView(APIView):
       return Response(serializer.errors, status=400)
 
     created_mentor = UserAPIService.create_sub_user(request, data=serializer.validated_data)
+    user_serializer = ResponseUserSerializer(created_mentor)
 
-    context = {
-      "id": created_mentor.id,
-      "username": created_mentor.username,
-      "email": created_mentor.email,
-    }
+    context = user_serializer.data
 
     return Response(context, status=201)
   
-
   def get(self, request):
     """ Fetch a mentor """
     #TODO: Implement fetching of mentor

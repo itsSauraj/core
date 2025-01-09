@@ -44,11 +44,13 @@ class CreateUserRequestSerializer(ModelSerializer):
 			return data
 		
 class UserSerializer(ModelSerializer):
+	
     class Meta:
         model = User
         fields = "__all__"
 				
-class ResponseUserSerializer(Serializer):
+class ResponseUserSerializer(ModelSerializer):
+	
     class Meta:
         model = User
-        exclude = ['password', 'deleted_at', 'created_by', 'updated_at']
+        exclude = ['password', 'deleted_at', 'created_by', 'updated_at', 'user_permissions', 'groups', 'created_at', 'is_active', 'is_superuser', 'is_staff', 'last_login']	

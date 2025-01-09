@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainSlidingView, TokenRefreshSlidingView
+
+from admin_panel.views.auth.controller import CustomTokenObtainSlidingView
 
 urlpatterns = [
   path('admin/', admin.site.urls),
@@ -10,6 +11,5 @@ urlpatterns = [
   path('api/auth/user/', include('admin_panel.user_urls')),
 
   # Auth Token APIs
-  path('api/auth/login/', TokenObtainSlidingView.as_view(), name='token_obtain_pair'),
-  path('api/auth/token/refresh/', TokenRefreshSlidingView.as_view(), name='token_refresh'),
+  path('api/auth/login/', CustomTokenObtainSlidingView.as_view(), name='user_login'),
 ]
