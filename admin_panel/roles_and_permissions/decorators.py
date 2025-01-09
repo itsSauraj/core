@@ -1,7 +1,7 @@
 from functools import wraps
 from rest_framework import status
 from rest_framework.response import Response
-
+    
 def group_required(group_name):
     """
     Decorator to check if the logged-in user belongs to a specific group.

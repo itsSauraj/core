@@ -68,3 +68,4 @@ class IsInGroup(BasePermission):
         if not request.user.groups.filter(name=self.group_name).exists():
             raise PermissionDenied(detail=f"You must be in the '{self.group_name}' group to access this resource.")
         return True
+    

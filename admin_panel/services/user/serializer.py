@@ -58,9 +58,3 @@ class ResponseUserSerializer(ModelSerializer):
 		model = User
 		fields = ['id', 'username', 'first_name', 'last_name', 'email', 
 						'address', 'birth_date', 'phone_number', 'groups']
-
-class RequestMemberSerializer(serializers.Serializer):
-	id = serializers.UUIDField(required=True)
-
-	class Meta:
-		fields = ['id']

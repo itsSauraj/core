@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from admin_panel.views.user.controller import UserAPIView, MemberAPIView
+from admin_panel.views.user.admin import UserAPIView
+from admin_panel.views.user.member import MemberAPIView
+
 from admin_panel.views.auth.controller import CustomTokenObtainSlidingView
 
 urlpatterns = [
@@ -11,7 +13,6 @@ urlpatterns = [
 
   # Membor and Trainee User Management API
   path('member/', MemberAPIView.as_view(), name='mentor_user_api'),
-  path('member/<uuid:member_id>', MemberAPIView.as_view(), name='mentor_user_api'),
 
   # Auth Token APIs
   path('login/', CustomTokenObtainSlidingView.as_view(), name='user_login'),
