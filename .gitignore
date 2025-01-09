@@ -10,6 +10,9 @@ db.sqlite3-journal
 # VSCode
 .vscode/
 
+# PyCharm
+.idea/
+
 # Virtual environment
 venv/
 env/

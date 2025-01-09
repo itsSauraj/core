@@ -38,8 +38,11 @@ class CreateUserRequestSerializer(ModelSerializer):
 		if data['password'] != data['confirm_password']:
 			raise serializers.ValidationError("Passwords do not match", code='password_mismatch')
 		
-		if data['role'].capitalize() not in ['', 'Mentor', 'Trainee']:
-			raise serializers.ValidationError("Invalid role", code='invalid_role')
+		try:
+			if data['role'].capitalize() not in ['', 'Mentor', 'Trainee']:
+				raise serializers.ValidationError("Invalid role", code='invalid_role')
+		except KeyError:
+			pass
 
 		return data
 		

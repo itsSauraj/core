@@ -7,6 +7,7 @@ from admin_panel.views.auth.controller import CustomTokenObtainSlidingView
 urlpatterns = [
   # Admin User Management API
   path('', UserAPIView.as_view(), name='admin_user_api'),
+  path('<uuid:id>/', UserAPIView.as_view(), name='admin_user_api'),
 
   # Membor and Trainee User Management API
   path('member/', MemberAPIView.as_view(), name='mentor_user_api'),

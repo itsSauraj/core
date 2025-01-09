@@ -33,47 +33,51 @@ class UserAPIService:
   def get_created_courses(user_id):
     return UserAPIService.get_user_by_id(user_id).get_created_courses()
   
+  @staticmethod
+  def add_user_to_group(user, group, many=False):
+    if many:
+      for group_name in group:
+        user.groups.add(Group.objects.get(name=group_name))
+    else:
+      user.groups.add(Group.objects.get(name=group))
+    user.save()
 
   @staticmethod
-  def create_admin(request, data):
+  def create(request, data, group=[]):
+
+    user_permissions = request.user.get_all_permissions()
+    required_permissions = ['custom_permission.mentors.create', 'custom_permission.trainees.create']
 
     serializer = UserSerializer(data)
 
-    user, created = User.objects.get_or_create(
-      **serializer.data,
-      is_staff=True,
-    )
+    if 'Admin' not in group and not all(permission in user_permissions for permission in required_permissions):
+        raise PermissionError('You do not have permission to create a user')
 
-    admin_group = Group.objects.get(name='Admin')
-    if created:
-      user.set_password(serializer.data['password'])
-      user.groups.add(admin_group)
+    user = User.objects.create_user(**serializer.data)
+    UserAPIService.add_user_to_group(user, group)
+
+    if 'Admin' not in group:
+      user.created_by = request.user
       user.save()
       
     return user
-
+  
   @staticmethod
-  @permission_required(['custom_permission.mentors.create', 'custom_permission.trainees.create'], raise_exception=True)
-  def create_sub_user(request, data):
-    
-    is_staff = False
-    type = data.get('role').capitalize()
-    
+  def update(request, data, user_id):
+
+    user = UserAPIService.get_user_by_id(user_id)
     serializer = UserSerializer(data)
-    
-    if type in ['Mentor', 'Admin']:
-      is_staff = True
 
-    user, created = User.objects.get_or_create(
-      **serializer.data,
-      is_staff=is_staff,
-    )
+    if user != request.user and 'Admin' not in request.user.groups.all():
+      raise PermissionError('You do not have permission to update this user')
 
-    user_group = Group.objects.get(name=type)
-    if created:
-      user.created_by = request.user
-      user.set_password(serializer.data['password'])
-      user.groups.add(user_group)
-      user.save()
+    for key, value in serializer.data.items():
+      setattr(user, key, value)
+    user.save()
 
     return user
+
+  @staticmethod
+  def delete(request, user_id):
+    UserAPIService.get_user_by_id(user_id).delete()
+    return True
