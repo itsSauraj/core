@@ -5,7 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from admin_panel.roles_and_permissions.roles import IsInGroup
 from admin_panel.models import User
 
-from admin_panel.services.user.serializer import CreateUserRequestSerializer, ResponseUserSerializer
+from admin_panel.services.user.serializer import CreateUserRequestSerializer, ResponseUserSerializer, \
+                                            RequestMemberSerializer
 from admin_panel.services.user.service import UserAPIService
 from rest_framework_simplejwt.tokens import SlidingToken
 
@@ -96,13 +97,48 @@ class MemberAPIView(APIView):
 
     return Response(context, status=201)
   
-  def get(self, request):
-    """ Fetch a mentor """
-    #TODO: Implement fetching of mentor
+  def get(self, request, member_id):
+    """ 
+    Fetch a mentor 
+
+    Example:
+    GET /api/auth/user/member/uuid
+    """
+
+    try:
+      member = UserAPIService.get_user_by_id(member_id)
+    except User.DoesNotExist:
+      return Response("User not found", status=404)
 
     context = {
-      "user": request.user.username,
-      "email": request.user.email,
+      "user": ResponseUserSerializer(member).data,
+      "permissions": request.user.get_all_permissions()
+    }
+
+    return Response(context, status=200)
+  
+
+  def patch(self, request, member_id):
+    """ 
+    Update a mentor 
+
+    Example:
+    PATCH /api/auth/user/member/uuid
+    """
+    try:
+      member = UserAPIService.get_user_by_id(member_id)
+    except User.DoesNotExist:
+      return Response("User not found", status=404)
+
+    serializer = CreateUserRequestSerializer(data=request.data)
+
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=400)
+
+    member.update(**serializer.validated_data)
+
+    context = {
+      "user": ResponseUserSerializer(member).data,
       "permissions": request.user.get_all_permissions()
     }
 

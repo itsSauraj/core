@@ -69,11 +69,6 @@ class UserAPIService:
       is_staff=is_staff,
     )
 
-    print(100*'-')
-    print(data)
-    print(user)
-    print(100*'-')
-
     user_group = Group.objects.get(name=type)
     if created:
       user.created_by = request.user

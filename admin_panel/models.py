@@ -4,14 +4,25 @@ from datetime import timedelta, datetime, timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 
+from django.db.models.signals import pre_delete, post_delete
+
+from admin_panel.manager import CustomUserManager
+
+from django_softdelete.models import SoftDeleteModel
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import transaction
+
 # Create your models here.
-class BaseModel(models.Model):
+class TimeStampedModel(models.Model):
   created_at = models.DateTimeField(('created at'), auto_now_add=True, null=False, blank=False)
   updated_at = models.DateTimeField(('updated at'), auto_now=True)
-  deleted_at = models.DateTimeField(('deleted at'), null=True, blank=True, on_delete=models.SET(datetime.now(timezone.utc)))
 
+  class Meta:
+    abstract = True
+
+class BaseModel(TimeStampedModel, SoftDeleteModel):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-  
+
   class Meta:
     abstract = True
 
@@ -21,10 +32,12 @@ class User(BaseModel, AbstractUser):
   phone_number = models.CharField(('phone number'),max_length=15, null=True, blank=True)
   birth_date = models.DateField(('birth date'), null=True, blank=True)
   address = models.TextField(('address'), null=True, blank=True)
-  
+
   email = models.EmailField(("email address"), unique=True)
 
   created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
+
+  objects = CustomUserManager()
 
   def __str__(self):
     return self.username
@@ -53,7 +66,7 @@ class User(BaseModel, AbstractUser):
 class Course(BaseModel):
   title = models.CharField(('course title'), max_length=255, null=False, blank=False)
   description = models.TextField(('course description'), null=True, blank=True)
-  created_by = models.ForeignKey(User, related_name='course')
+  created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='course')
 
   def __str__(self):
     return self.title
