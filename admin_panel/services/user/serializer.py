@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from admin_panel.models import User
 
-class CreateAdminRequestSerializer(ModelSerializer):
+class CreateUserRequestSerializer(ModelSerializer):
 		
 		"""
 		Takes data from the request and validates it
@@ -20,10 +20,11 @@ class CreateAdminRequestSerializer(ModelSerializer):
 		"""
 
 		confirm_password = serializers.CharField(write_only=True)
+		role = serializers.CharField(write_only=True, required=False)
 
 		class Meta:
 			model = User
-			fields = ['email', 'password', 'confirm_password' , 'first_name', 'last_name', "username"]
+			fields = ['email', 'password', 'confirm_password' , 'first_name', 'last_name', "username", "role"]
 
 		def validate(self, data):
 			password_regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$"
@@ -36,9 +37,18 @@ class CreateAdminRequestSerializer(ModelSerializer):
 
 			if data['password'] != data['confirm_password']:
 				raise serializers.ValidationError("Passwords do not match", code='password_mismatch')
-			return data
+			
+			if data['role'].capitalize() not in ['', 'Mentor', 'Trainee']:
+				raise serializers.ValidationError("Invalid role", code='invalid_role')
 
+			return data
+		
 class UserSerializer(ModelSerializer):
-		class Meta:
-			model = User
-			fields = '__all__'
+    class Meta:
+        model = User
+        fields = "__all__"
+				
+class ResponseUserSerializer(Serializer):
+    class Meta:
+        model = User
+        exclude = ['password', 'deleted_at', 'created_by', 'updated_at']

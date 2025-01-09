@@ -1,6 +1,7 @@
 from admin_panel.models import User
 from admin_panel.services.user.serializer import UserSerializer
 
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import Group
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -23,10 +24,36 @@ class UserAPIService:
       user.set_password(serializer.data['password'])
       user.groups.add(admin_group)
       user.save()
-
-    
+      
     return user
 
-  def create_mentor(request, data):
-    print("Creating mentor")
-    return { 'message': 'Mentor created' }
+  @staticmethod
+  @permission_required(['custom_permission.mentors.create', 'custom_permission.trainees.create'], raise_exception=True)
+  def create_sub_user(request, data):
+    
+    is_staff = False
+    type = data.get('role').capitalize()
+    
+    serializer = UserSerializer(data)
+    
+    if type in ['Mentor', 'Admin']:
+      is_staff = True
+
+    user, created = User.objects.get_or_create(
+      **serializer.data,
+      is_staff=is_staff,
+    )
+
+    print(100*'-')
+    print(data)
+    print(user)
+    print(100*'-')
+
+    user_group = Group.objects.get(name=type)
+    if created:
+      user.created_by = request.user
+      user.set_password(serializer.data['password'])
+      user.groups.add(user_group)
+      user.save()
+
+    return user
