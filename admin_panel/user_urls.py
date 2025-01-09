@@ -7,6 +7,6 @@ urlpatterns = [
   # Admin User Management API
   path('', UserAPIView.as_view(), name='admin_user_api'),
 
-  # Mentor User Management API
+  # Membor and Trainee User Management API
   path('member/', MemberAPIView.as_view(), name='mentor_user_api'),
 ]

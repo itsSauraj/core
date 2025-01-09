@@ -180,6 +180,6 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.SlidingToken',),
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=30),
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=600),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=7),
 }
