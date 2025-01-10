@@ -117,7 +117,7 @@ class MemberModules():
   
   @staticmethod
   @api_view(['GET'])
-  @permission_required('custom_permission.mentors.view')
+  @permission_required('custom_permission.mentors.view', raise_exception=True)
   def get_all_mentors(request):
     """ 
     Fetch all mentors 
@@ -131,7 +131,7 @@ class MemberModules():
   
   @staticmethod
   @api_view(['GET'])
-  @permission_required('custom_permission.trainees.view')
+  @permission_required('custom_permission.trainees.view', raise_exception=True)
   def get_all_trainees(request):
     """ 
     Fetch all mentors 

@@ -71,14 +71,9 @@ class Course(BaseModel):
   def __str__(self):
     return self.title
   
-  def save(self, *args, **kwargs):
-    if not self.sequence:
-      self.sequence = Course.objects.filter(created_by=self.created_by).count() + 1
-    super(Course, self).save(*args, **kwargs)
-  
   # Get all modules of the course
   def get_all_modules(self):
-    return self.modules.filter(parnet_module__isnull=True).order_by('sequence')
+    return self.modules.filter(parent_module__isnull=True).order_by('sequence')
   
   # Get all lessons of the course
   def get_complete_structure(self):
@@ -93,22 +88,28 @@ class Course(BaseModel):
     return complete_structure
   
 class CourseModules(BaseModel):
-  title = models.CharField(('module title'), max_length=255, null=False, blank=False)
+  title = models.CharField(('module title'), max_length=255, null=False, blank=False, unique=False)
   description = models.TextField(('module description'), null=True, blank=True)
-  course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
-  parnet_module = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_modules', verbose_name='parent module')
+  course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True, related_name='modules')
+  parent_module = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_modules', verbose_name='parent module')
   sequence = models.IntegerField(('module sequence'), default=0)
 
   def __str__(self):
-    return self.title
+    try:
+      return f"{self.sequence} {self.title} - {self.course.title}"
+    except:
+      return f"{self.sequence} {self.title}"
   
   def save(self, *args, **kwargs):
     if not self.sequence:
-      self.sequence = CourseModules.objects.filter(course=self.course, parnet_module=self.parnet_module).count() + 1
+      if self.parent_module:
+        self.sequence = CourseModules.objects.filter(parent_module=self.parent_module).count() + 1
+      else:
+        self.sequence = CourseModules.objects.filter(course=self.course).count() + 1
     super(CourseModules, self).save(*args, **kwargs)
   
   def get_sub_modules(self):
-    return CourseModules.objects.filter(parnet_module=self).order_by('sequence')
+    return CourseModules.objects.filter(parent_module=self).order_by('sequence')
 
   def get_all_lessons(self):
     return self.lessons.all().order_by('sequence')
