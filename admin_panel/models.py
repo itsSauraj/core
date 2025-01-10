@@ -108,24 +108,30 @@ class CourseModules(BaseModel):
         self.sequence = CourseModules.objects.filter(course=self.course).count() + 1
     super(CourseModules, self).save(*args, **kwargs)
   
+  @property
   def get_sub_modules(self):
     return CourseModules.objects.filter(parent_module=self).order_by('sequence')
 
+  @property
   def get_all_lessons(self):
     return self.lessons.all().order_by('sequence')
   
 class CourseModuleLessons(BaseModel):
   title = models.CharField(('lesson title'), max_length=255, null=False, blank=False)
   description = models.TextField(('lesson description'), null=True, blank=True)
-  course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons')
-  module = models.ForeignKey(CourseModules, on_delete=models.CASCADE, related_name='lessons')
+  course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True, related_name='lessons')
+  module = models.ForeignKey(CourseModules, on_delete=models.CASCADE, null=True, blank=True, related_name='lessons')
   sequence = models.IntegerField(('lesson sequence'), default=0)
   duration = models.DurationField(('lesson duration'), default=timedelta(hours=0, minutes=0, seconds=0)) # Duration in hours (e.g. 1:30:00)
 
   def __str__(self):
-    return self.title
+    try:
+      return f"{self.sequence} {self.title} - {self.module.title} - {self.course.title}"
+    except:
+      return f"{self.sequence} {self.title}"
   
-  def save(self, *args, **kargs):
+  
+  def save(self, *args, **kwargs):
     if not self.sequence:
-      self.sequence = CourseModuleLessons.objects.filter(course=self.course, module=self.module).count() + 1
-    super(CourseModuleLessons, self).save(*args, **kargs)
+      self.sequence = CourseModuleLessons.objects.filter(module=self.module).count() + 1
+    super(CourseModuleLessons, self).save(*args, **kwargs)

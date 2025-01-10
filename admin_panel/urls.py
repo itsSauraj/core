@@ -3,7 +3,7 @@ from django.urls import path, include
 
 from admin_panel.views.user.admin import UserAPIView
 from admin_panel.views.user.member import MemberAPIView, MemberModules
-from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView
+from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, LessonAPIView
 
 urlpatterns = [
   # Admin User Management APIs
@@ -21,4 +21,8 @@ urlpatterns = [
   ## Module Management APIs
   path('course/<uuid:course_id>/module/', ModuleAPIView.as_view(), name='module_api'),
   path('course/<uuid:course_id>/module/<uuid:module_id>', ModuleAPIView.as_view(), name='module_api_with_id'),
+
+  ### Lesson Management APIs
+  path('course/<uuid:course_id>/module/<uuid:module_id>/lesson/', LessonAPIView.as_view(), name='lesson_api'),
+  path('course/<uuid:course_id>/module/<uuid:module_id>/lesson/<uuid:lesson_id>', LessonAPIView.as_view(), name='lesson_api'),
 ]

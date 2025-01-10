@@ -21,7 +21,7 @@ class CreateLessonRequestSerializer(ModelSerializer):
   
   class Meta:
     model = CourseModuleLessons
-    fields = ['title', 'description', 'course', 'module', 'sequence', 'duration']
+    fields = ['title', 'description', 'sequence', 'duration']
 
 
 
@@ -33,7 +33,22 @@ class ResponseCourseSerializer(ModelSerializer):
     fields = ['id', 'title', 'description', 'created_by', 'created_at']
 
 class ResponseModuleSerializer(ModelSerializer):
+  duration = serializers.DurationField(required=False)
 
   class Meta:
     model = CourseModules
-    fields = ['id', 'title', 'description', 'course', 'parent_module', 'sequence', 'created_at']
+    fields = ['id', 'title', 'description', 'course', 'parent_module', 'sequence', 'created_at', 'duration']
+
+class ResponseModuleStructureSerializer(serializers.Serializer):
+  metadata = serializers.SerializerMethodField()
+  sub_modules = serializers.SerializerMethodField()
+  lessons = serializers.SerializerMethodField()
+
+  def get_metadata(self, obj):
+    return ResponseModuleSerializer(obj['metadata']).data
+
+  def get_sub_modules(self, obj):
+    return ResponseModuleSerializer(obj['sub_modules'], many=True).data
+
+  def get_lessons(self, obj):
+    return ResponseModuleSerializer(obj['lessons'], many=True).data
