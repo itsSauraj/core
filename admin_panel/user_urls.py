@@ -4,7 +4,8 @@ from django.urls import path, include
 from admin_panel.views.user.admin import UserAPIView
 from admin_panel.views.user.member import MemberAPIView
 
-from admin_panel.views.auth.controller import CustomTokenObtainSlidingView
+from admin_panel.views.auth.controller import CustomTokenObtainSlidingView, CustomTokenRefreshSlidingView, \
+                                          LogoutView
 
 urlpatterns = [
   # Admin User Management API
@@ -16,4 +17,6 @@ urlpatterns = [
 
   # Auth Token APIs
   path('login/', CustomTokenObtainSlidingView.as_view(), name='user_login'),
+  path('refresh/', CustomTokenRefreshSlidingView.as_view(), name='user_refresh'),
+  path('logout/', LogoutView.as_view(), name='user_logout'),
 ]
