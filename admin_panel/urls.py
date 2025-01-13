@@ -1,7 +1,5 @@
-from django.contrib import admin
 from django.urls import path, include
 
-from admin_panel.views.user.admin import UserAPIView
 from admin_panel.views.user.member import MemberAPIView, MemberModules
 from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, LessonAPIView
 

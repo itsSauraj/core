@@ -17,6 +17,6 @@ urlpatterns = [
 
   # Auth Token APIs
   path('login/', CustomTokenObtainSlidingView.as_view(), name='user_login'),
-  path('refresh/', CustomTokenRefreshSlidingView.as_view(), name='user_refresh'),
+  path('refresh/', CustomTokenRefreshSlidingView.as_view(), name='user_refresh'), 
   path('logout/', LogoutView.as_view(), name='user_logout'),
 ]

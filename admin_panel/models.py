@@ -32,6 +32,7 @@ class User(BaseModel, AbstractUser):
   phone_number = models.CharField(('phone number'),max_length=15, null=True, blank=True)
   birth_date = models.DateField(('birth date'), null=True, blank=True)
   address = models.TextField(('address'), null=True, blank=True)
+  joining_date = models.DateField(('joining date'), null=True, blank=True)
 
   email = models.EmailField(("email address"), unique=True)
 

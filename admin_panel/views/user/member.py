@@ -31,7 +31,8 @@ class MemberAPIView(APIView):
       "email": "",
       "password": "password",
       "confirm_password": "password"
-      "role": "Mentor"
+      "role": "Mentor",
+      "joining_date": "2021-01-01",
     }
     """
 

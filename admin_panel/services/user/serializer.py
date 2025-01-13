@@ -16,6 +16,7 @@ class CreateUserRequestSerializer(ModelSerializer):
 		"email": "example@mail.com",
 		"password": "password",
 		"confirm_password": "password"
+		"joining_date": "2021-01-01",
 	}
 	"""
 
@@ -24,7 +25,7 @@ class CreateUserRequestSerializer(ModelSerializer):
 
 	class Meta:
 		model = User
-		fields = ['email', 'password', 'confirm_password' , 'first_name', 'last_name', "username", "role"]
+		fields = ['email', 'password', 'confirm_password' , 'first_name', 'last_name', "username", "role", "joining_date"]
 
 	def validate(self, data):
 		password_regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$"
