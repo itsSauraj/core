@@ -46,12 +46,7 @@ class MemberAPIView(APIView):
     created_mentor = UserAPIService.create(request, data=serializer.validated_data, group=group)
     user_serializer = ResponseUserSerializer(created_mentor)
 
-    context = {
-      "user": user_serializer.data,
-      "message": f"{group} created successfully"
-    }
-
-    return Response(context, status=201)
+    return Response(user_serializer.data, status=201)
 
   def get(self, request, member_id):
     """ 
