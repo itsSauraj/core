@@ -58,4 +58,4 @@ class ResponseUserSerializer(ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['id', 'username', 'first_name', 'last_name', 'email', 
-						'address', 'birth_date', 'phone_number', 'groups']
+						'address', 'birth_date', 'phone_number', 'groups', 'joining_date']

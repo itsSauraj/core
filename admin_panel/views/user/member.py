@@ -140,7 +140,11 @@ class MemberModules():
     Example:
     GET /api/auth/user/trainee/
     """
-    members = UserAPIService.get_user_trainees(request.user.id)
+    if request.user.groups.filter(name='Mentor').exists():
+      #TODO: Add permission to fetch all trainees that are assigned to the mentor
+      members = UserAPIService.get_all_trainees()
+    else:
+      members = UserAPIService.get_user_trainees(request.user.id)
     context = ResponseUserSerializer(members, many=True).data
     return Response(context, status=200)
   

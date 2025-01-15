@@ -29,6 +29,8 @@ class BaseModel(TimeStampedModel, SoftDeleteModel):
 
 class User(BaseModel, AbstractUser):
 
+  # TODO: Add employee ID field
+
   phone_number = models.CharField(('phone number'),max_length=15, null=True, blank=True)
   birth_date = models.DateField(('birth date'), null=True, blank=True)
   address = models.TextField(('address'), null=True, blank=True)

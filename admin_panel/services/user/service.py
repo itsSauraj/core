@@ -30,6 +30,10 @@ class UserAPIService:
     return UserAPIService.get_user_by_id(user_id).get_created_trainees()
   
   @staticmethod
+  def get_all_trainees():
+    return User.objects.filter(groups__name='Trainee')
+  
+  @staticmethod
   def get_created_courses(user_id):
     return UserAPIService.get_user_by_id(user_id).get_created_courses()
   
