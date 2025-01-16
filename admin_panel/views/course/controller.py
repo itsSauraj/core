@@ -8,7 +8,7 @@ from admin_panel.roles_and_permissions.roles import IsInGroup
 
 from admin_panel.services.course.serializer import CreateCourseRequestSerializer, CreateModuleRequestSerializer, \
                                               CreateLessonRequestSerializer, ResponseCourseSerializer, ResponseModuleSerializer
-from admin_panel.services.course.service import CourseAPIService
+from admin_panel.services.course.service import CourseAPIService, CourseDataSerializer
 
 
 from rest_framework.views import APIView
@@ -78,13 +78,8 @@ class CourseAPIView(APIView):
   def get(self, request, course_id=None):
 
     if course_id is not None:
-      course = CourseAPIService.get_course_by_id(course_id, request.user)
-      
-      context = {
-        "course": ResponseCourseSerializer(course).data
-      }
-      
-      return Response(context, status=200)
+      course = CourseAPIService.get_course_structure(course_id, request.user) 
+      return Response(course, status=200)
     
     courses = CourseAPIService.get_all_courses(created_by=request.user)
     courses_serializer = ResponseCourseSerializer(courses, many=True)

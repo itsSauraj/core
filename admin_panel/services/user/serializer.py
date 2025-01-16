@@ -10,6 +10,7 @@ class CreateUserRequestSerializer(ModelSerializer):
 	"""
 	Takes data from the request and validates it
 	data = {
+		"employee_id": "123456",
 		"username": "johndoe",
 		"first_name": "John",
 		"last_name": "Doe"
@@ -17,6 +18,7 @@ class CreateUserRequestSerializer(ModelSerializer):
 		"password": "password",
 		"confirm_password": "password"
 		"joining_date": "2021-01-01",
+		"phone_number": "1234567890",
 	}
 	"""
 
@@ -25,7 +27,7 @@ class CreateUserRequestSerializer(ModelSerializer):
 
 	class Meta:
 		model = User
-		fields = ['email', 'password', 'confirm_password' , 'first_name', 'last_name', "username", "role", "joining_date"]
+		fields = ['employee_id', 'email', 'password', 'confirm_password' , 'first_name', 'last_name', "username", "role", "joining_date", "phone_number"]
 
 	def validate(self, data):
 		password_regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$"
@@ -57,5 +59,5 @@ class ResponseUserSerializer(ModelSerializer):
 	
 	class Meta:
 		model = User
-		fields = ['id', 'username', 'first_name', 'last_name', 'email', 
+		fields = ['employee_id', 'id', 'username', 'first_name', 'last_name', 'email', 
 						'address', 'birth_date', 'phone_number', 'groups', 'joining_date']

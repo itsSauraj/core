@@ -26,6 +26,7 @@ class MemberAPIView(APIView):
     """ 
     Create a new mentor 
     data = {
+      "employee_id": "123456",
       "first_name": "John",
       "last_name": "Doe",
       "email": "",
@@ -33,6 +34,7 @@ class MemberAPIView(APIView):
       "confirm_password": "password"
       "role": "Mentor",
       "joining_date": "2021-01-01",
+      "phone_number": "1234567890",
     }
     """
 
