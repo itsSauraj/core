@@ -24,20 +24,18 @@ class CourseAPIView(APIView):
 
   def post(self, request):
     
-    serializer = CreateCourseRequestSerializer(data=request.data)
+    serializer = CourseDataSerializer(data=request.data)
     
     if not serializer.is_valid():
       return Response(serializer.errors, status=400)
-    
-    created_course = CourseAPIService.create(request, data=serializer.validated_data)
-    course_serializer = ResponseCourseSerializer(created_course)
-    
-    context = {
-      "course": course_serializer.data,
-      "message": "Course created successfully"
-    }
-    
-    return Response(context, status=201)
+
+    try:
+      created_course = CourseAPIService.import_course(request, data=serializer.validated_data)
+      return Response(ResponseCourseSerializer(created_course).data, status=201)
+    except Exception as e:
+      print(e)
+      return Response({"message": "Internal Server Errr"}, status=500)
+
 
   def delete(self, request, course_id=None):
 

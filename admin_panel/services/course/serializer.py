@@ -23,6 +23,31 @@ class CreateLessonRequestSerializer(ModelSerializer):
     model = CourseModuleLessons
     fields = ['title', 'description', 'sequence', 'duration']
 
+    
+class CourseDataSerializer(serializers.Serializer):
+  course = CreateCourseRequestSerializer()
+  modules = serializers.ListField(child=serializers.DictField())
+
+  def validate_modules(self, value):
+    if not value:
+      raise serializers.ValidationError("Modules list cannot be empty.")
+    for module in value:
+      module_serializer = CreateModuleRequestSerializer(data=module)
+      module_serializer.is_valid(raise_exception=True)
+      lessons = module.get('lessons', [])
+      if not lessons:
+        raise serializers.ValidationError("Each module must have at least one lesson.")
+      for lesson in lessons:
+        lesson_serializer = CreateLessonRequestSerializer(data=lesson)
+        lesson_serializer.is_valid(raise_exception=True)
+    return value
+
+  def validate(self, data):
+    course_serializer = CreateCourseRequestSerializer(data=data['course'])
+    course_serializer.is_valid(raise_exception=True)
+    self.validate_modules(data['modules'])
+    return data
+
 
 
 # Respsonse serializers
@@ -30,7 +55,7 @@ class ResponseCourseSerializer(ModelSerializer):
   
   class Meta:
     model = Course
-    fields = ['id', 'title', 'description', 'created_by', 'created_at']
+    fields = ['id', 'title', 'description']
 
 class ResponseModuleSerializer(ModelSerializer):
   duration = serializers.DurationField(required=False)
