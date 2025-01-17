@@ -162,6 +162,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+MEIDA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+
 AUTH_USER_MODEL = 'admin_panel.User'
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

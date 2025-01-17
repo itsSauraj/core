@@ -77,3 +77,24 @@ class ResponseModuleStructureSerializer(serializers.Serializer):
 
   def get_lessons(self, obj):
     return ResponseModuleSerializer(obj['lessons'], many=True).data
+
+
+## course group
+from admin_panel.models import CourseCollection
+
+class CreateRequestCourseGroupSerializer(ModelSerializer):
+  image = serializers.ImageField(required=False)
+  
+  class Meta:
+    model = CourseCollection
+    fields = ['title', 'description', 'courses', 'image']
+
+class ResponseCourseGroupSerializer(ModelSerializer):
+  courses = serializers.SerializerMethodField()
+
+  class Meta:
+    model = CourseCollection
+    fields = ['id', 'title', 'description', 'courses', 'image']
+
+  def get_courses(self, obj):
+    return [{'id': course.id, 'title': course.title} for course in obj.courses.all()]

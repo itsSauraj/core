@@ -30,8 +30,7 @@ class CustomTokenObtainSlidingView(TokenObtainSlidingView):
     
     return Response({
       'token': str(token),
-      'user': ResponseUserSerializer(user).data,
-      'userType': user.groups.all()[0].name.lower()
+      'user': ResponseUserSerializer(user).data
     }, status=status.HTTP_200_OK)
 
 class CustomTokenRefreshSlidingView(TokenRefreshSlidingView):

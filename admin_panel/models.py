@@ -12,6 +12,8 @@ from django_softdelete.models import SoftDeleteModel
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import transaction
 
+from .utils import rename_file
+
 # Create your models here.
 class TimeStampedModel(models.Model):
   created_at = models.DateTimeField(('created at'), auto_now_add=True, null=False, blank=False)
@@ -139,3 +141,18 @@ class CourseModuleLessons(BaseModel):
     if not self.sequence:
       self.sequence = CourseModuleLessons.objects.filter(module=self.module).count() + 1
     super(CourseModuleLessons, self).save(*args, **kwargs)
+
+
+class CourseCollection(BaseModel):
+  title = models.CharField(('collection title'), max_length=255, null=False, blank=False)
+  description = models.TextField(('collection description'), null=True, blank=True)
+  courses = models.ManyToManyField(Course, related_name='collections', blank=True)
+  image = models.ImageField(upload_to=rename_file, null=True, blank=True)
+  
+  created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='collections')
+
+  def __str__(self):
+    return self.title
+  
+  def save(self, *args, **kwargs):
+    super(CourseCollection, self).save(*args, **kwargs)

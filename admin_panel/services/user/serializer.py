@@ -56,8 +56,12 @@ class UserSerializer(ModelSerializer):
 		fields = "__all__"
 		
 class ResponseUserSerializer(ModelSerializer):
+	groups = serializers.SerializerMethodField()
 	
 	class Meta:
 		model = User
 		fields = ['employee_id', 'id', 'username', 'first_name', 'last_name', 'email', 
 						'address', 'birth_date', 'phone_number', 'joining_date', 'groups']
+	
+	def get_groups(self, obj):
+		return [group.name.lower() for group in obj.groups.all()]

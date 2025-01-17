@@ -175,3 +175,4 @@ class CourseAPIService:
       "metadata": metadata,
       "modules": module_structure,
     }
+  

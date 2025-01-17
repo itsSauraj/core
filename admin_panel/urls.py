@@ -2,6 +2,8 @@ from django.urls import path, include
 
 from admin_panel.views.user.member import MemberAPIView, MemberModules
 from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, LessonAPIView
+from admin_panel.views.course.course_collection import CourseCollectionAPIView
+
 
 urlpatterns = [
   # Admin User Management APIs
@@ -16,6 +18,9 @@ urlpatterns = [
   # Course Management APIs  
   path('course/', CourseAPIView.as_view(), name='course_api'),
   path('course/<uuid:course_id>', CourseAPIView.as_view(), name='course_api_with_id'),
+  #
+  path('course/collection/', CourseCollectionAPIView.as_view(), name='course_collections_api'),
+  path('course/collection/<uuid:collection_id>', CourseCollectionAPIView.as_view(), name='course_collection_api'),
 
   ## Module Management APIs
   path('course/<uuid:course_id>/module/', ModuleAPIView.as_view(), name='module_api'),
