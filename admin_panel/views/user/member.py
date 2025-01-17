@@ -63,10 +63,7 @@ class MemberAPIView(APIView):
     except User.DoesNotExist:
       return Response("User not found", status=404)
 
-    context = {
-      "user": ResponseUserSerializer(member).data,
-      "permissions": request.user.get_all_permissions()
-    }
+    context = ResponseUserSerializer(member).data
 
     return Response(context, status=200)
 
