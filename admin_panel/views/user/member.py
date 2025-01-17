@@ -94,22 +94,31 @@ class MemberAPIView(APIView):
 
     return Response(context, status=200)
 
-  def delete(self, request, member_id):
+  def delete(self, request, member_id=None):
     """ 
     Delete a mentor 
 
     Example:
     DELETE /api/auth/user/member/uuid
+    or
+    Example:
+    body = UUID[]
+    eg: ["uuid1", "uuid2"]
     """
+    if not member_id and not request.data:
+      return Response("User ID is required", status=400)
+
     try:
-      UserAPIService.delete(request, member_id)
+      if member_id:
+        UserAPIService.delete(request, member_id)
+        message = "User deleted successfully"
+      else:
+        UserAPIService.delete(request, request.data, many=True)
+        message = "Users deleted successfully"
+      return Response({"message": message}, status=204)
     except User.DoesNotExist:
-      return Response("User not found", status=404)
-    context = {
-      "message": "User deleted successfully"
-    }
-    return Response(context, status=204)
-  
+      return Response("User not found" if member_id else "One or more users not found", status=404)
+    
 
 class MemberModules():
   

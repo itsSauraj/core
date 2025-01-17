@@ -27,11 +27,11 @@ class CustomTokenObtainSlidingView(TokenObtainSlidingView):
 
     user = User.objects.get(username=request.data['username'])
     token = SlidingToken.for_user(user)
-
+    
     return Response({
       'token': str(token),
       'user': ResponseUserSerializer(user).data,
-      'permissions': user.get_permissions()
+      'userType': user.groups.all()[0].name.lower()
     }, status=status.HTTP_200_OK)
 
 class CustomTokenRefreshSlidingView(TokenRefreshSlidingView):

@@ -82,6 +82,10 @@ class UserAPIService:
     return user
 
   @staticmethod
-  def delete(request, user_id):
-    UserAPIService.get_user_by_id(user_id).delete()
+  def delete(request, user_id, many=False):
+    if many:
+      User.objects.filter(id__in=user_id).delete()
+    else:
+      UserAPIService.get_user_by_id(user_id).delete()
+
     return True

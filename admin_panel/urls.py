@@ -7,7 +7,8 @@ urlpatterns = [
   # Admin User Management APIs
   path('auth/user/', include('admin_panel.user_urls')),
 
-  path('member/<uuid:member_id>', MemberAPIView.as_view(), name='mentor_user_api'),
+  path('member/', MemberAPIView.as_view(), name='members_api'),
+  path('member/<uuid:member_id>', MemberAPIView.as_view(), name='mentor_id_apis'),
 
   path('user/mentor/', MemberModules.get_all_mentors, name='get_all_mentors'),
   path('user/trainee/', MemberModules.get_all_trainees, name='get_all_trainees'),
