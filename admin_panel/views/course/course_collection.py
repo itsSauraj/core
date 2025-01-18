@@ -1,6 +1,5 @@
 import json
 
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -16,7 +15,10 @@ from admin_panel.services.course.course_collection import CourseCollectionAPISer
 from rest_framework.views import APIView
 
 class CourseCollectionAPIView(APIView):
-  parser_classes = [MultiPartParser, FormParser] 
+  def get_parsers(self):
+    if self.request.method == 'POST':
+      return [MultiPartParser(), FormParser()]
+    return super().get_parsers()
 
   def get_permissions(self):
     if self.request.method in ['POST', 'DELETE', 'PATCH']:
@@ -27,9 +29,10 @@ class CourseCollectionAPIView(APIView):
   def post(self, request):
 
     serializer = CreateRequestCourseGroupSerializer(data=request.data)
-    
-    if not serializer.is_valid():
-      return Response(serializer.errors, status=400)
+    courses_data = json.loads(request.data.get('courses'))
+    serializer.is_valid(raise_exception=True)
+    courses_data = [str(uuid) for uuid in courses_data]
+    serializer.validated_data['courses'] = courses_data
 
     try:
       created_course = CourseCollectionAPIService.create(request, data=serializer.validated_data)
@@ -44,7 +47,7 @@ class CourseCollectionAPIView(APIView):
       if collection_id:
         CourseCollectionAPIService.delete(request, collection_id)
       else:
-        ids = request.data.get("ids")
+        ids = request.data
         if not ids:
           return Response({"message": "Collection ID(s) required"}, status=400)
         CourseCollectionAPIService.delete(request, ids, many=True)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from admin_panel.models import Course, CourseModules, CourseModuleLessons
+from admin_panel.models import Course, CourseModules, CourseModuleLessons, CourseCollection
 
 class CreateCourseRequestSerializer(ModelSerializer):
   
@@ -79,15 +79,15 @@ class ResponseModuleStructureSerializer(serializers.Serializer):
     return ResponseModuleSerializer(obj['lessons'], many=True).data
 
 
-## course group
-from admin_panel.models import CourseCollection
+class UUIDSerializer(serializers.Serializer):
+  uuids = serializers.ListField(child=serializers.UUIDField())
 
 class CreateRequestCourseGroupSerializer(ModelSerializer):
   image = serializers.ImageField(required=False)
   
   class Meta:
     model = CourseCollection
-    fields = ['title', 'description', 'courses', 'image']
+    fields = ['title', 'description', 'image']
 
 class ResponseCourseGroupSerializer(ModelSerializer):
   courses = serializers.SerializerMethodField()
