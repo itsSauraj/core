@@ -1,12 +1,14 @@
 import json
 
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from rest_framework.permissions import IsAuthenticated
 from admin_panel.roles_and_permissions.roles import IsInGroup
+from admin_panel.roles_and_permissions.decorators import group_required
 
 from admin_panel.services.course.serializer import CreateRequestCourseGroupSerializer, ResponseCourseGroupSerializer
 from admin_panel.services.course.course_collection import CourseCollectionAPIService
@@ -21,7 +23,7 @@ class CourseCollectionAPIView(APIView):
     return super().get_parsers()
 
   def get_permissions(self):
-    if self.request.method in ['POST', 'DELETE', 'PATCH']:
+    if self.request.method in ['POST', 'DELETE', 'PATCH', 'PUT']:
       return [IsAuthenticated(), IsInGroup('Admin')]
     else:
       return [IsAuthenticated()]
@@ -59,15 +61,28 @@ class CourseCollectionAPIView(APIView):
   def patch(self, request, collection_id=None):
     try:
       course_collection = CourseCollectionAPIService.get(request.user, collection_id)
+      if not course_collection:
+        return Response({"message": "Course not found"}, status=404)
       serializer = CreateRequestCourseGroupSerializer(course_collection, data=request.data, partial=True)
+
+      if 'courses' in request.data:
+        courses_data = json.loads(request.data.get('courses'))
+        serializer.is_valid(raise_exception=True)
+        courses_data = [str(uuid) for uuid in courses_data]
+        previous_courses = [course.id for course in course_collection.courses.all()]
+        updated_courses = previous_courses + courses_data
+        serializer.validated_data['courses'] = updated_courses
+
       if not serializer.is_valid():
         return Response(serializer.errors, status=400)
       course_collection = CourseCollectionAPIService.update(request, course_collection, serializer.validated_data)
       return Response(ResponseCourseGroupSerializer(course_collection).data, status=200)
     except ObjectDoesNotExist:
       return Response({"message": "Course not found"}, status=404)
-
     
+  def put(self, request, collection_id=None):
+    return CourseCollectionModules.all_courses_in_collection(request, collection_id)
+
   def get(self, request, collection_id=None):
 
     if collection_id is not None:
@@ -80,3 +95,34 @@ class CourseCollectionAPIView(APIView):
     context = courses_serializer.data
     
     return Response(context, status=200)
+
+
+class CourseCollectionModules():
+
+  @staticmethod
+  @api_view(['DELETE', 'PATCH'])
+  @group_required('Admin')
+  def course_actions_collection(request, collection_id, course_id):
+
+    print(request.method)
+
+    if request.method == 'DELETE':
+      return CourseCollectionModules.delete_course_from_collection(request, collection_id, course_id)
+
+  @staticmethod
+  def delete_course_from_collection(request, collection_id, course_id):
+    try:
+      CourseCollectionAPIService.delete_course_from_collection(request, collection_id, course_id)
+      return Response({"message": "Course deleted from collection successfully"}, status=204)
+    except ObjectDoesNotExist:
+      return Response({"message": "Course not found"}, status=404)
+    
+
+  @staticmethod
+  def all_courses_in_collection(request, collection_id):
+
+    try:
+      courses = CourseCollectionAPIService.get_all_courses_in_collection(request, collection_id)
+      return Response(courses, status=200)
+    except ObjectDoesNotExist:
+      return Response({"message": "Course not found"}, status=404)

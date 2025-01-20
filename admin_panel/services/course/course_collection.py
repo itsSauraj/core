@@ -66,3 +66,15 @@ class CourseCollectionAPIService:
 
     course_collection.save()
     return course_collection
+  
+
+  @staticmethod
+  def delete_course_from_collection(request, collection_id, course_id):
+    try:
+      course_collection = CourseCollectionAPIService.get(request.user, collection_id)
+      course = Course.objects.get(id=course_id)
+      course_collection.courses.remove(course)
+      course_collection.save()
+    except Exception as e:
+      raise ObjectDoesNotExist
+      
