@@ -43,6 +43,8 @@ class User(BaseModel, AbstractUser):
 
   created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
 
+  enrolled_collections = models.ManyToManyField('CourseCollection', related_name='enrolled_users', blank=True)
+
   objects = CustomUserManager()
 
   def __str__(self):
@@ -156,3 +158,38 @@ class CourseCollection(BaseModel):
   
   def save(self, *args, **kwargs):
     super(CourseCollection, self).save(*args, **kwargs)
+
+
+class UserCoursesEnrolled(BaseModel):
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrolled_courses')
+  collection = models.ForeignKey(CourseCollection, on_delete=models.CASCADE)
+  enrolled_on = models.DateTimeField(('enrolled on'), auto_now_add=True)
+  started_on = models.DateTimeField(('started on'), null=True, blank=True)
+  completed_on = models.DateTimeField(('completed on'), null=True, blank=True)
+  completed = models.BooleanField(('completed'), default=False)
+
+  assigned_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_courses')
+
+  def __str__(self):
+    return f"{self.user.username} - {self.collection.title}"
+  
+  def save(self, *args, **kwargs):
+    super(UserCoursesEnrolled, self).save(*args, **kwargs)
+
+# class UserCourseProgress(BaseModel):
+#   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_progress')
+#   course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='user_progress')
+#   module = models.ForeignKey(CourseModules, on_delete=models.CASCADE, related_name='user_progress')
+#   lesson = models.ForeignKey(CourseModuleLessons, on_delete=models.CASCADE, related_name='user_progress')
+#   completed_on = models.DateTimeField(('completed on'), null=True, blank=True)
+
+#   def __str__(self):
+#     return f"{self.user.username} - {self.course.title} - {self.module.title} - {self.lesson.title}"
+  
+#   def save(self, *args, **kwargs):
+#     super(UserCourseProgress, self).save(*args, **kwargs)
+  
+#   def lesson_complete(self):
+#     self.completed = True
+#     self.completed_on = datetime.now(timezone.utc)
+#     self.save()

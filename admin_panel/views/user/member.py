@@ -9,6 +9,7 @@ from admin_panel.models import User
 
 from admin_panel.services.user.serializer import CreateUserRequestSerializer, ResponseUserSerializer
 from admin_panel.services.user.service import UserAPIService
+from admin_panel.services.trainee.serializer import ReportCourseCollectionSerializer
 
 from django.contrib.auth.decorators import permission_required
 from admin_panel.roles_and_permissions.decorators import group_required
@@ -151,3 +152,26 @@ class MemberModules():
     context = ResponseUserSerializer(members, many=True).data
     return Response(context, status=200)
   
+  @staticmethod
+  @api_view(['GET'])
+  @permission_required('custom_permission.trainees.view', raise_exception=True)
+  def generate_report(request, pk):
+    """ 
+    Generate report for a mentor 
+
+    Example:
+    GET /api/auth/user/member/uuid/report
+    """
+
+    trainee = UserAPIService.get_trainee(pk, request.user)
+
+    if not trainee:
+      return Response("Not trainee not found", status=404)
+
+    enrolled_courses_collection = trainee.enrolled_courses.all()
+
+    context = {
+      'trainee': ResponseUserSerializer(trainee).data,
+      'collections':  ReportCourseCollectionSerializer(enrolled_courses_collection, many=True).data
+    }
+    return Response(context, status=200)

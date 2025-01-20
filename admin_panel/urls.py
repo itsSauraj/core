@@ -3,6 +3,7 @@ from django.urls import path, include
 from admin_panel.views.user.member import MemberAPIView, MemberModules
 from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, LessonAPIView
 from admin_panel.views.course.course_collection import CourseCollectionAPIView, CourseCollectionModules
+from admin_panel.views.trainee.controller import TraineeCourseAPIView
 
 
 urlpatterns = [
@@ -14,6 +15,7 @@ urlpatterns = [
 
   path('user/mentor/', MemberModules.get_all_mentors, name='get_all_mentors'),
   path('user/trainee/', MemberModules.get_all_trainees, name='get_all_trainees'),
+  path('user/trainee/<uuid:pk>/report', MemberModules.generate_report, name='generate_report'),
 
   # Course Management APIs  
   path('course/', CourseAPIView.as_view(), name='course_api'),
@@ -30,4 +32,9 @@ urlpatterns = [
   ### Lesson Management APIs
   path('course/<uuid:course_id>/module/<uuid:module_id>/lesson/', LessonAPIView.as_view(), name='lesson_api'),
   path('course/<uuid:course_id>/module/<uuid:module_id>/lesson/<uuid:lesson_id>', LessonAPIView.as_view(), name='lesson_api'),
+
+
+  ### Trainee Course Management APIs
+  path('trainee/course/', TraineeCourseAPIView.as_view(), name='trainee_course_api'),
+  path('trainee/course/<uuid:collection_id>', TraineeCourseAPIView.as_view(), name='trainee_course_api'),
 ]

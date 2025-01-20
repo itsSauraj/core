@@ -26,6 +26,10 @@ class CourseAPIService:
     return Course.objects.all().filter(created_by=created_by)
   
   @staticmethod
+  def get_assined_courses(user):
+    return user
+  
+  @staticmethod
   def get_module_by_id(module_id):
     try:
       module = CourseModules.objects.get(id=module_id)

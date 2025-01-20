@@ -26,6 +26,10 @@ class UserAPIService:
     return UserAPIService.get_user_by_id(user_id).get_created_mentors()
   
   @staticmethod
+  def get_trainee(pk, user):
+    return User.objects.get(id=pk, created_by=user)
+
+  @staticmethod
   def get_user_trainees(user_id):
     return UserAPIService.get_user_by_id(user_id).get_created_trainees()
   
