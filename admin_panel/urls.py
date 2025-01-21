@@ -3,7 +3,7 @@ from django.urls import path, include
 from admin_panel.views.user.member import MemberAPIView, MemberModules
 from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, LessonAPIView
 from admin_panel.views.course.course_collection import CourseCollectionAPIView, CourseCollectionModules
-from admin_panel.views.trainee.controller import TraineeCourseAPIView
+from admin_panel.views.trainee.controller import TraineeCourseAPIView, TraineeAPIView
 
 
 urlpatterns = [
@@ -37,4 +37,7 @@ urlpatterns = [
   ### Trainee Course Management APIs
   path('trainee/course/', TraineeCourseAPIView.as_view(), name='trainee_course_api'),
   path('trainee/course/<uuid:collection_id>', TraineeCourseAPIView.as_view(), name='trainee_course_api'),
+
+  ### For trainee to view course
+  path('member/collection/', TraineeAPIView.get_all_assigned_collections, name='trainee_assigned_collections'),
 ]

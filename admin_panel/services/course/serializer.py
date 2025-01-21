@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from admin_panel.models import Course, CourseModules, CourseModuleLessons, CourseCollection
+from .dependencies import get_course_duration, get_collection_duration
 
 class CreateCourseRequestSerializer(ModelSerializer):
   
@@ -52,10 +53,14 @@ class CourseDataSerializer(serializers.Serializer):
 
 # Respsonse serializers
 class ResponseCourseSerializer(ModelSerializer):
+  duration = serializers.SerializerMethodField()
   
   class Meta:
     model = Course
-    fields = ['id', 'title', 'description']
+    fields = ['id', 'title', 'description', 'duration']
+
+  def get_duration(self, obj):
+    return get_course_duration(obj)
 
 class ResponseModuleSerializer(ModelSerializer):
   duration = serializers.DurationField(required=False)
@@ -87,14 +92,25 @@ class CreateRequestCourseGroupSerializer(ModelSerializer):
   
   class Meta:
     model = CourseCollection
-    fields = ['title', 'description', 'image']
+    fields = ['title', 'description', 'image', 'alloted_time']
 
 class ResponseCourseGroupSerializer(ModelSerializer):
   courses = serializers.SerializerMethodField()
+  duration = serializers.SerializerMethodField()
 
   class Meta:
     model = CourseCollection
-    fields = ['id', 'title', 'description', 'courses', 'image']
+    fields = ['id', 'title', 'description', 'duration', 'image', 'alloted_time', 'courses']
 
   def get_courses(self, obj):
-    return [{'id': course.id, 'title': course.title} for course in obj.courses.all()]
+    return [
+      {
+        'id': course.id, 
+        'title': course.title,
+        'description': course.description,
+        'duration': get_course_duration(course)
+      } for course in obj.courses.all()
+    ]
+  
+  def get_duration(self, obj):
+    return get_collection_duration(obj)

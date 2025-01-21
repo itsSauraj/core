@@ -150,6 +150,7 @@ class CourseCollection(BaseModel):
   description = models.TextField(('collection description'), null=True, blank=True)
   courses = models.ManyToManyField(Course, related_name='collections', blank=True)
   image = models.ImageField(upload_to=rename_file, null=True, blank=True)
+  alloted_time = models.IntegerField(('alloted time'), blank=False, null=False) # Alloted time in hours
   
   created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='collections')
 
@@ -158,6 +159,10 @@ class CourseCollection(BaseModel):
   
   def save(self, *args, **kwargs):
     super(CourseCollection, self).save(*args, **kwargs)
+
+  @property
+  def get_all_courses(self):
+    return self.courses.all()
 
 
 class UserCoursesEnrolled(BaseModel):

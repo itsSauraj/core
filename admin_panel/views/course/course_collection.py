@@ -32,7 +32,10 @@ class CourseCollectionAPIView(APIView):
 
     serializer = CreateRequestCourseGroupSerializer(data=request.data)
     courses_data = json.loads(request.data.get('courses'))
-    serializer.is_valid(raise_exception=True)
+    
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=400)
+
     courses_data = [str(uuid) for uuid in courses_data]
     serializer.validated_data['courses'] = courses_data
 

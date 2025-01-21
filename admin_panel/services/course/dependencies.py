@@ -19,6 +19,14 @@ def get_course_duration(course):
   return duration
 
 
+def get_collection_duration(collection):
+  duration = timedelta(seconds=0)
+  for course in collection.get_all_courses:
+    duration += get_course_duration(course)
+
+  return duration
+
+
 def get_all_module_contents(module):
   sub_modules = []
   for sub_module in module.get_sub_modules:

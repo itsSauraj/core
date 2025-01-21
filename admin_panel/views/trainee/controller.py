@@ -1,9 +1,11 @@
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from admin_panel.roles_and_permissions.roles import IsInGroup
+from admin_panel.roles_and_permissions.decorators import group_required
 
-from admin_panel.services.trainee.serializer import CreateUserCollectionSerializer
+from admin_panel.services.trainee.serializer import CreateUserCollectionSerializer, ReportCourseCollectionSerializer
 from admin_panel.services.trainee.service import TraineeCourseServices
 
 class TraineeCourseAPIView(APIView):
@@ -35,3 +37,14 @@ class TraineeCourseAPIView(APIView):
       return Response({"message": "Collection not found"}, status=404)
     
     return Response(status=204)
+  
+
+class TraineeAPIView():
+
+  @staticmethod
+  @api_view(['GET'])
+  @group_required(['Trainee', 'Admin'])
+  def get_all_assigned_collections(request):
+
+    assigned_collections = request.user.enrolled_courses.all()
+    return Response(ReportCourseCollectionSerializer(assigned_collections, many=True).data, status=200)

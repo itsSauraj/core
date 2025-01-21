@@ -35,3 +35,14 @@ class ReportCourseCollectionSerializer(ModelSerializer):
   
   def assigned_by(self, obj):
     return obj.collection.created_by.username
+  
+
+class ResponseTraineeAssignedCollections(ModelSerializer):
+  collection = serializers.SerializerMethodField()
+
+  class Meta:
+    model = UserCoursesEnrolled
+    fields = ['collection', 'started_on', 'completed_on', 'completed']
+
+  def get_collection(self, obj):
+    return ResponseCourseGroupSerializer(obj.collection).data

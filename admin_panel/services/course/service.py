@@ -167,7 +167,6 @@ class CourseAPIService:
   def get_course_structure(course_id, user):
     course = CourseAPIService.get_course_by_id(course_id, user)
     metadata = ResponseCourseSerializer(course).data
-    metadata['duration'] = get_course_duration(course)
 
     modules = course.get_all_modules()
     module_structure = []
