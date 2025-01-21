@@ -7,6 +7,7 @@ from admin_panel.roles_and_permissions.decorators import group_required
 
 from admin_panel.services.trainee.serializer import CreateUserCollectionSerializer, ReportCourseCollectionSerializer
 from admin_panel.services.trainee.service import TraineeCourseServices
+from admin_panel.services.course.service import CourseAPIService
 
 class TraineeCourseAPIView(APIView):
   def get_permissions(self):
@@ -48,3 +49,25 @@ class TraineeAPIView():
 
     assigned_collections = request.user.enrolled_courses.all()
     return Response(ReportCourseCollectionSerializer(assigned_collections, many=True).data, status=200)
+  
+
+  @staticmethod
+  @api_view(['GET'])
+  @group_required(['Trainee', 'Admin'])
+  def get_assigned_course(request, course_id):
+    try:
+      assigned_courses = request.user.get_enrolled_courses_list()
+      if assigned_courses is None:
+        return Response({"message": "Course not found"}, status=404)
+      
+      assigned_by = assigned_courses[0].created_by
+
+      assigned_course = next((course for course in assigned_courses if course.id == course_id), None)
+      if assigned_course:
+        course_structure = CourseAPIService.get_course_structure(assigned_course.id, assigned_by)
+        return Response(course_structure, status=200)
+      else: 
+        return Response({"message": "Course not found"}, status=404)
+    except Exception as e:
+      print(e)
+      return Response({"message": "Course not found"}, status=404)

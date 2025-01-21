@@ -40,4 +40,5 @@ urlpatterns = [
 
   ### For trainee to view course
   path('member/collection/', TraineeAPIView.get_all_assigned_collections, name='trainee_assigned_collections'),
+  path('member/collection/<uuid:course_id>', TraineeAPIView.get_assigned_course, name='trainee_assigned_course'),
 ]

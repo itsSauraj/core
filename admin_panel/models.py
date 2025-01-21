@@ -30,9 +30,6 @@ class BaseModel(TimeStampedModel, SoftDeleteModel):
     
 
 class User(BaseModel, AbstractUser):
-
-  # TODO: Add employee ID field
-
   phone_number = models.CharField(('phone number'),max_length=15, null=True, blank=True)
   birth_date = models.DateField(('birth date'), null=True, blank=True)
   address = models.TextField(('address'), null=True, blank=True)
@@ -70,6 +67,14 @@ class User(BaseModel, AbstractUser):
   # Get all courses of the user
   def get_created_courses(self):
     return self.course_set.all()
+
+  # Get all collections coures of the user
+  def get_enrolled_courses_list(self):
+    collections = self.enrolled_courses.all()
+    courses_list = [
+      course for collection in collections for course in collection.collection.courses.all()
+    ]
+    return courses_list
 
 class Course(BaseModel):
   title = models.CharField(('course title'), max_length=255, null=False, blank=False)
