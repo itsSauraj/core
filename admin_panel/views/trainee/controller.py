@@ -72,14 +72,14 @@ class TraineeAPIView():
   @staticmethod
   @api_view(['GET', 'POST'])
   @group_required(['Trainee', 'Admin'])
-  def user_course_actions(request, course_id):
+  def user_course_actions(request, collection_id, course_id):
     if course_id is None:
       return Response({"message": "Course ID is required"}, status=400)
 
     if request.method == 'GET':
       return TraineeAPIView.get_assigned_course(request, course_id)
     elif request.method == 'POST':
-      return TraineeAPIView.start_course(request, course_id)
+      return TraineeAPIView.start_course(request, collection_id, course_id)
     else:
       return Response({"message": "Method not allowed"}, status=405)
 
@@ -110,7 +110,7 @@ class TraineeAPIView():
       return Response({"message": "Internal Server Error"}, status=500)
 
   @staticmethod
-  def start_course(request, course_id):
+  def start_course(request, collection_id, course_id):
     if course_id is None:
       return Response({"message": "Course ID is required"}, status=400)
     
