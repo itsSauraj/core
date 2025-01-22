@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 
-from admin_panel.models import Course, CourseModules, CourseModuleLessons
+from admin_panel.models import Course, CourseModules, CourseModuleLessons, UserCourseActivity
 
 from .serializer import ResponseCourseSerializer, ResponseModuleStructureSerializer, \
   CreateLessonRequestSerializer, CreateModuleRequestSerializer, CourseDataSerializer
@@ -178,4 +178,12 @@ class CourseAPIService:
       "metadata": metadata,
       "modules": module_structure,
     }
+
+  @staticmethod
+  def start_user_course(data):
+    user_course_activity, created = UserCourseActivity.objects.get_or_create(**data)
+    return user_course_activity
   
+  @staticmethod
+  def course_is_started(course_id, user):
+    return UserCourseActivity.objects.filter(course_id=course_id, user=user)

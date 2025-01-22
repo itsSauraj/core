@@ -1,7 +1,5 @@
-from admin_panel.models import Course, CourseCollection, UserCoursesEnrolled
-
-# from admin_panel.services.user.service import UserAPIService
-
+from admin_panel.models import CourseCollection, UserCoursesEnrolled, UserCourseActivity,\
+  UserCourseProgress, CourseModuleLessons
 
 class TraineeCourseServices:
 
@@ -43,3 +41,20 @@ class TraineeCourseServices:
       collection.delete()
       return True
     return False
+  
+
+  @staticmethod
+  def start_user_course(data):
+    user_course_activity, created = UserCourseActivity.objects.get_or_create(**data)
+    return user_course_activity
+
+  
+  @staticmethod
+  def mark_lesson_as_completed(request, data):
+    user_course_progress, created = UserCourseProgress.objects.get_or_create(**data)
+    return user_course_progress
+  
+  @staticmethod
+  def get_completed_lessons(user_id, course_id):
+    completed_lessons = UserCourseProgress.objects.filter(user_id=user_id, course_id=course_id)
+    return completed_lessons

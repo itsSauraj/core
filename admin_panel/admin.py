@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from django.contrib.auth.models import Permission
 
-from admin_panel.models import User, Course, CourseModules, CourseModuleLessons, CourseCollection
+from admin_panel.models import User, Course, CourseModules, CourseModuleLessons, \
+  CourseCollection, UserCourseActivity, UserCoursesEnrolled, UserCourseProgress
 
 # Register your models here.
 
@@ -13,3 +14,7 @@ admin.site.register(CourseCollection)
 admin.site.register(Course)
 admin.site.register(CourseModules)
 admin.site.register(CourseModuleLessons)
+
+admin.site.register(UserCoursesEnrolled)
+admin.site.register(UserCourseActivity)
+admin.site.register(UserCourseProgress)

@@ -176,7 +176,7 @@ class UserCoursesEnrolled(BaseModel):
   enrolled_on = models.DateTimeField(('enrolled on'), auto_now_add=True)
   started_on = models.DateTimeField(('started on'), null=True, blank=True)
   completed_on = models.DateTimeField(('completed on'), null=True, blank=True)
-  completed = models.BooleanField(('completed'), default=False)
+  is_completed = models.BooleanField(('completed'), default=False)
 
   assigned_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_courses')
 
@@ -186,20 +186,27 @@ class UserCoursesEnrolled(BaseModel):
   def save(self, *args, **kwargs):
     super(UserCoursesEnrolled, self).save(*args, **kwargs)
 
-# class UserCourseProgress(BaseModel):
-#   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_progress')
-#   course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='user_progress')
-#   module = models.ForeignKey(CourseModules, on_delete=models.CASCADE, related_name='user_progress')
-#   lesson = models.ForeignKey(CourseModuleLessons, on_delete=models.CASCADE, related_name='user_progress')
-#   completed_on = models.DateTimeField(('completed on'), null=True, blank=True)
+class UserCourseActivity(BaseModel):
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_activity')
+  course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='user_activity')
+  started_on = models.DateTimeField(('started on'), auto_now_add=True)
+  completed_on = models.DateTimeField(('completed on'), null=True, blank=True)
 
-#   def __str__(self):
-#     return f"{self.user.username} - {self.course.title} - {self.module.title} - {self.lesson.title}"
+  def __str__(self):
+    return f"{self.user.username} - {self.course.title} - {self.started_on} - {self.completed_on}"
+
+class UserCourseProgress(BaseModel):
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_progress')
+  course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='user_progress')
+  module = models.ForeignKey(CourseModules, on_delete=models.CASCADE, null=True, blank=True, related_name='user_progress')
+  lesson = models.ForeignKey(CourseModuleLessons, on_delete=models.CASCADE, null=True, blank=True, related_name='user_progress')
+  completed_on = models.DateTimeField(('completed on'), auto_now_add=True)
+
+  def __str__(self):
+    return f"{self.user.username} - {self.course.title} - {self.module.title} - {self.lesson.title}"
   
-#   def save(self, *args, **kwargs):
-#     super(UserCourseProgress, self).save(*args, **kwargs)
-  
-#   def lesson_complete(self):
-#     self.completed = True
-#     self.completed_on = datetime.now(timezone.utc)
-#     self.save()
+  def save(self, *args, **kwargs):
+    super(UserCourseProgress, self).save(*args, **kwargs)
+
+  def get_completed_lessons(self, course):
+    return self.objects.filter(course=course, completed_on__isnull=False)

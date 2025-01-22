@@ -22,7 +22,7 @@ class CreateLessonRequestSerializer(ModelSerializer):
   
   class Meta:
     model = CourseModuleLessons
-    fields = ['title', 'description', 'sequence', 'duration']
+    fields = ['id', 'title', 'description', 'sequence', 'duration']
 
     
 class CourseDataSerializer(serializers.Serializer):
