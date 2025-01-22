@@ -58,3 +58,12 @@ class TraineeCourseServices:
   def get_completed_lessons(user_id, course_id):
     completed_lessons = UserCourseProgress.objects.filter(user_id=user_id, course_id=course_id)
     return completed_lessons
+  
+  @staticmethod
+  def get_course_progress(user_id, course_id):
+    lessons_completed = UserCourseProgress.objects.filter(user_id=user_id, course_id=course_id)
+    total_lessons = CourseModuleLessons.objects.filter(module__course_id=course_id).count()
+    progress_in_percent = (lessons_completed.count() / total_lessons) * 100
+    return progress_in_percent
+    
+    

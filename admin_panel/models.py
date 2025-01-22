@@ -100,6 +100,9 @@ class Course(BaseModel):
       complete_structure.append(module_structure)
     return complete_structure
   
+  def get_all_lessons(self):
+    return self.lessons.all().order_by('sequence')
+  
 class CourseModules(BaseModel):
   title = models.CharField(('module title'), max_length=255, null=False, blank=False, unique=False)
   description = models.TextField(('module description'), null=True, blank=True)

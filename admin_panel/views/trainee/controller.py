@@ -53,10 +53,11 @@ class TraineeAPIView():
       return Response({"message": "No assigned collections"}, status=404)
     
     started_courses_by_collection = {
-      str(metadata.collection.id): [
-      str(course.id) for course in metadata.collection.courses.all() 
-      if CourseAPIService.course_is_started(course.id, request.user.id)
-      ]
+      str(metadata.collection.id): {
+        str(course.id): TraineeCourseServices.get_course_progress(request.user.id, course.id) 
+        for course in metadata.collection.courses.all() 
+          if CourseAPIService.course_is_started(course.id, request.user.id)
+      }
       for metadata in assigned_collections
     }
 
