@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from admin_panel.models import Course, CourseModules, CourseModuleLessons, CourseCollection
-from .dependencies import get_course_duration, get_collection_duration
+from admin_panel.models import Course, CourseModules, CourseModuleLessons, CourseCollection,\
+    UserCourseProgress
+from .dependencies import get_course_duration, get_collection_duration, get_module_duration
 
 class CreateCourseRequestSerializer(ModelSerializer):
   
@@ -114,3 +115,39 @@ class ResponseCourseGroupSerializer(ModelSerializer):
   
   def get_duration(self, obj):
     return get_collection_duration(obj)
+  
+
+class ResponseReportModuleSerializer(serializers.ModelSerializer):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.user_id = self.context.get('user_id')
+
+  duration = serializers.SerializerMethodField()
+  lessons = serializers.SerializerMethodField()
+  
+  class Meta:
+    model = CourseModules
+    fields = ['id', 'title', 'description', 'sequence', 'duration', 'lessons']
+
+  def get_duration(self, obj):
+    return get_module_duration(obj)
+
+  def get_lessons(self, obj):
+    return ResponseCompletedLessonsSerializer(obj.get_all_lessons, context={'user_id': self.user_id}, many=True).data
+  
+
+  
+class ResponseCompletedLessonsSerializer(serializers.ModelSerializer):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.user_id = self.context.get('user_id')
+  
+  # UserCourseProgress
+  completed = serializers.SerializerMethodField()
+
+  class Meta:
+    model = CourseModuleLessons
+    fields = ['id', 'title', 'description', 'sequence', 'duration', 'completed']
+
+  def get_completed(self, obj):
+    return UserCourseProgress.objects.filter(user_id=self.user_id, lesson_id=obj.id).exists()

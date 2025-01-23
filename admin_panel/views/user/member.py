@@ -9,7 +9,10 @@ from admin_panel.models import User
 
 from admin_panel.services.user.serializer import CreateUserRequestSerializer, ResponseUserSerializer
 from admin_panel.services.user.service import UserAPIService
-from admin_panel.services.trainee.serializer import ReportCourseCollectionSerializer
+from admin_panel.services.course.service import CourseAPIService
+from admin_panel.services.trainee.admin_serializer import AdminReportCourseCollectionSerializer, \
+  AdminResponseCourseGroupSerializer
+from admin_panel.services.trainee.service import TraineeCourseServices
 
 from django.contrib.auth.decorators import permission_required
 from admin_panel.roles_and_permissions.decorators import group_required
@@ -155,23 +158,37 @@ class MemberModules():
   @staticmethod
   @api_view(['GET'])
   @permission_required('custom_permission.trainees.view', raise_exception=True)
-  def generate_report(request, pk):
+  def generate_report(request, trainee_id):
     """ 
     Generate report for a mentor 
 
     Example:
-    GET /api/auth/user/member/uuid/report
+    GET /api/auth/user/member/<uuid:trainee_id>/report
     """
 
-    trainee = UserAPIService.get_trainee(pk, request.user)
+    trainee = UserAPIService.get_trainee(trainee_id, request.user)
 
     if not trainee:
       return Response("Not trainee not found", status=404)
 
     enrolled_courses_collection = trainee.enrolled_courses.all()
 
+    enrolled_collections_data = AdminReportCourseCollectionSerializer(enrolled_courses_collection, many=True).data
+    
+    serializer_context = {
+      "user": request.user,
+      "trainee_id": trainee_id,
+      "metadata": enrolled_collections_data
+    }
+    
+    collection_data_list = [
+      AdminResponseCourseGroupSerializer(enrolled_collection.collection, context=serializer_context).data 
+      for enrolled_collection in enrolled_courses_collection
+    ]
+
     context = {
       'trainee': ResponseUserSerializer(trainee).data,
-      'collections':  ReportCourseCollectionSerializer(enrolled_courses_collection, many=True).data
+      'collections':  collection_data_list,
+      'other_data': enrolled_collections_data,
     }
     return Response(context, status=200)

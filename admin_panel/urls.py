@@ -15,7 +15,7 @@ urlpatterns = [
 
   path('user/mentor/', MemberModules.get_all_mentors, name='get_all_mentors'),
   path('user/trainee/', MemberModules.get_all_trainees, name='get_all_trainees'),
-  path('user/trainee/<uuid:pk>/report', MemberModules.generate_report, name='generate_report'),
+  path('user/trainee/<uuid:trainee_id>/report', MemberModules.generate_report, name='generate_report'),
 
   # Course Management APIs  
   path('course/', CourseAPIView.as_view(), name='course_api'),

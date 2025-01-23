@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 
 from admin_panel.models import CourseCollection, UserCoursesEnrolled, UserCourseActivity,\
   UserCourseProgress, CourseModuleLessons
+from admin_panel.services.course.dependencies import get_course_duration
+from admin_panel.services.course.serializer import ResponseReportModuleSerializer
 
 class TraineeCourseServices:
 
@@ -135,3 +137,29 @@ class TraineeCourseServices:
       days_taken = (estimate_date - start_date).days
 
     return days_taken
+  
+  @staticmethod
+  def generate_course_report(course, user_id):
+    is_started = False
+    started_on = None
+    is_completed = False
+    completed_on = None
+    modules=[]
+    lesson_serializer_context = {
+      user_id: user_id
+    }
+
+    modules = ResponseReportModuleSerializer(course.modules, context={'user_id': user_id}, many=True).data
+
+    return {
+      'id': course.id, 
+      'title': course.title,
+      'description': course.description,
+      'duration': get_course_duration(course),
+      'progress': TraineeCourseServices.get_course_progress(user_id, course.id),
+      'is_started': is_started,
+      'started_on': started_on,
+      'is_completed': is_completed,
+      'completed_on': completed_on,
+      'modules': modules
+    }
