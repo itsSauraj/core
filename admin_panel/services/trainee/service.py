@@ -1,3 +1,6 @@
+import calendar
+from datetime import timedelta
+
 from datetime import datetime, timezone
 
 from admin_panel.models import CourseCollection, UserCoursesEnrolled, UserCourseActivity,\
@@ -70,8 +73,12 @@ class TraineeCourseServices:
     get_course_progress = TraineeCourseServices.get_course_progress(request.user.id, user_course_progress.course.id)
     if get_course_progress == 100:
       course_activity.completed_on = datetime.now(timezone.utc)
-      if TraineeCourseServices.get_collection_progress(request.user.id, collection_id) == 100:
-        UserCoursesEnrolled.objects.filter(user=request.user, collection_id=collection_id).update(
+
+      current_course_collection = UserCoursesEnrolled.objects.filter(
+        request.user.id, collection_id=collection_id)
+
+      if TraineeCourseServices.get_collection_progress(current_course_collection.first()) == 100:
+        current_course_collection.update(
           completed_on=datetime.now(timezone.utc),
           is_completed=True
         )
@@ -88,15 +95,43 @@ class TraineeCourseServices:
     lessons_completed = UserCourseProgress.objects.filter(user_id=user_id, course_id=course_id)
     total_lessons = CourseModuleLessons.objects.filter(module__course_id=course_id).count()
     progress_in_percent = (lessons_completed.count() / total_lessons) * 100
-    return progress_in_percent
+    return round(progress_in_percent, 2)
     
-
   @staticmethod
-  def get_collection_progress(user_id, collection_id):
-    current_collection = UserCoursesEnrolled.objects.filter(user_id=user_id, collection_id=collection_id).first()
+  def get_collection_progress(current_collection):
     collection_courses = current_collection.collection.courses.all()
     progress = 0
     for course in collection_courses:
-      progress += TraineeCourseServices.get_course_progress(user_id, course.id)
-    return progress / collection_courses.count()
+      progress += TraineeCourseServices.get_course_progress(current_collection.user.id, course.id)
+    return round(progress / collection_courses.count(), 2)
     
+  @staticmethod
+  def estimated_collection_completeion_date(current_collection):
+    if not current_collection.started_on:
+      return None
+
+    current_date = current_collection.started_on
+    alloted_number_of_days = current_collection.collection.alloted_time
+
+    while alloted_number_of_days > 0:
+        current_date += timedelta(days=1)
+        if calendar.weekday(current_date.year, current_date.month, current_date.day) != calendar.SUNDAY:
+            alloted_number_of_days -= 1
+
+    return current_date
+
+  @staticmethod
+  def get_time_taken_to_complete(current_collection):
+    start_date = current_collection.started_on
+    completed_on = current_collection.completed_on
+    estimate_date = TraineeCourseServices.estimated_collection_completeion_date(current_collection)
+
+    if not start_date or not estimate_date:
+      return 0
+    
+    if completed_on:
+      days_taken = (completed_on - start_date).days
+    else:   
+      days_taken = (estimate_date - start_date).days
+
+    return days_taken

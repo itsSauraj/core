@@ -4,6 +4,7 @@ from rest_framework.serializers import ModelSerializer
 from admin_panel.models import Course, CourseCollection, UserCoursesEnrolled, \
   UserCourseProgress, UserCourseActivity
 from admin_panel.services.course.serializer import ResponseCourseGroupSerializer
+from admin_panel.services.trainee.service import TraineeCourseServices
 
 
 class CreateUserCollectionSerializer(ModelSerializer):
@@ -23,17 +24,34 @@ class CreateUserCollectionSerializer(ModelSerializer):
       return collections
     return value
   
-
 class ReportCourseCollectionSerializer(ModelSerializer):
   collection = serializers.SerializerMethodField()
+  progress = serializers.SerializerMethodField()
+  days_taken = serializers.SerializerMethodField()
+  due_time = serializers.SerializerMethodField()
+  estimated_completion_date = serializers.SerializerMethodField()
 
   class Meta:
     model = UserCoursesEnrolled
-    fields = ['collection', 'started_on', 'completed_on', 'is_completed', 'assigned_by']
+    fields = ['started_on', 'completed_on', 'is_completed', 'progress', 'days_taken', 
+              'due_time', 'estimated_completion_date' ,'assigned_by', 'collection']
 
   def get_collection(self, obj):
     return ResponseCourseGroupSerializer(obj.collection).data
   
+  def get_progress(self, obj):
+    return TraineeCourseServices.get_collection_progress(obj)
+  
+  def get_days_taken(self, obj):
+    return TraineeCourseServices.get_time_taken_to_complete(obj)
+  
+  def get_due_time(self, obj):
+    due_days = TraineeCourseServices.get_time_taken_to_complete(obj) - obj.collection.alloted_time
+    return due_days
+  
+  def get_estimated_completion_date(self, obj):
+    return TraineeCourseServices.estimated_collection_completeion_date(obj)
+
   def assigned_by(self, obj):
     return obj.collection.created_by.username
 
