@@ -41,5 +41,5 @@ urlpatterns = [
   ### For trainee to view course
   path('member/collection/', TraineeAPIView.get_all_assigned_collections, name='trainee_assigned_collections'),
   path('member/<uuid:collection_id>/<uuid:course_id>', TraineeAPIView.user_course_actions, name='trainee_course_action'),
-  path('member/collection/<uuid:course_id>/<uuid:lesson_id>', TraineeAPIView.user_course_lessson_actions, name='trainee_course_lesson_action'),
+  path('member/action/lesson', TraineeAPIView.user_course_lessson_actions, name='trainee_course_lesson_action'),
 ]

@@ -6,7 +6,7 @@ from admin_panel.roles_and_permissions.roles import IsInGroup
 from admin_panel.roles_and_permissions.decorators import group_required
 
 from admin_panel.services.trainee.serializer import CreateUserCollectionSerializer, ReportCourseCollectionSerializer, \
-  CreateUserCourseActivitySerializer, CreateLessonProgressSerializer, ResponeUserCourseProgressSerializer
+  CreateUserCourseActivitySerializer, CreateLessonProgressSerializer, ResponeUserCourseProgressSerializer, LessonLearnedSerializer
 from admin_panel.services.trainee.service import TraineeCourseServices
 from admin_panel.services.course.service import CourseAPIService
 
@@ -124,7 +124,7 @@ class TraineeAPIView():
     if not serializer.is_valid():
       return Response(serializer.errors, status=400)
     
-    start_user_course = TraineeCourseServices.start_user_course(serializer.validated_data)
+    start_user_course = TraineeCourseServices.start_user_course(request, collection_id, serializer.validated_data)
     if start_user_course is None:
       return Response({"message": "Course not found"}, status=404)
     
@@ -134,17 +134,23 @@ class TraineeAPIView():
   @staticmethod
   @api_view(['POST'])
   @group_required(['Trainee', 'Admin'])
-  def user_course_lessson_actions(request, course_id, lesson_id):
-    if not course_id and not lesson_id:
-      return Response({"message": "Course ID and Lesson ID are required"}, status=400)
+  def user_course_lessson_actions(request):
+
+    serializer = LessonLearnedSerializer(data=request.data)
+
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=400)
+    
+    validated_data = serializer.validated_data
 
     if request.method == 'POST':
-      return TraineeAPIView.mark_lesson_as_completed(request, course_id, lesson_id)
+      return TraineeAPIView.mark_lesson_as_completed(request, validated_data['collection_id'],
+                                        validated_data['course_id'], validated_data['lesson_id']) 
     else:
       return Response({"message": "Method not allowed"}, status=405)
     
   @staticmethod
-  def mark_lesson_as_completed(request, course_id, lesson_id):
+  def mark_lesson_as_completed(request, collection_id, course_id, lesson_id):
 
     requested_data = {
       "course": course_id,
@@ -158,7 +164,7 @@ class TraineeAPIView():
       return Response(serializer.errors, status=400)
     
     try:
-      user_course_progress = TraineeCourseServices.mark_lesson_as_completed(request, serializer.validated_data)
+      user_course_progress = TraineeCourseServices.mark_lesson_as_completed(request, collection_id, serializer.validated_data)
       if user_course_progress is None:
         return Response({"message": "Lesson not found"}, status=404)
     except Exception as e:

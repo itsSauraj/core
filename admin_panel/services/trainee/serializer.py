@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from admin_panel.models import Course, CourseCollection, UserCoursesEnrolled, UserCourseProgress, UserCourseActivity
+from admin_panel.models import Course, CourseCollection, UserCoursesEnrolled, \
+  UserCourseProgress, UserCourseActivity
 from admin_panel.services.course.serializer import ResponseCourseGroupSerializer
 
 
@@ -70,3 +71,8 @@ class ResponeUserCourseProgressSerializer(ModelSerializer):
 
   def get_lesson(self, obj):
     return obj.lesson.id
+  
+class LessonLearnedSerializer(serializers.Serializer):
+  collection_id = serializers.UUIDField()
+  course_id = serializers.UUIDField()
+  lesson_id = serializers.UUIDField()

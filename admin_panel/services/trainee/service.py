@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from admin_panel.models import CourseCollection, UserCoursesEnrolled, UserCourseActivity,\
   UserCourseProgress, CourseModuleLessons
 
@@ -44,14 +46,36 @@ class TraineeCourseServices:
   
 
   @staticmethod
-  def start_user_course(data):
+  def start_user_course(request, collection_id, data):
+    
+    EnrolledCollection = request.user.enrolled_courses.filter(collection_id=collection_id)
+    if not EnrolledCollection.exists():
+      return None
+  
+    if not EnrolledCollection.first().started_on:
+      EnrolledCollection.update(
+        started_on=datetime.now(timezone.utc)
+      )
+
     user_course_activity, created = UserCourseActivity.objects.get_or_create(**data)
     return user_course_activity
 
   
   @staticmethod
-  def mark_lesson_as_completed(request, data):
+  def mark_lesson_as_completed(request, collection_id, data):
     user_course_progress, created = UserCourseProgress.objects.get_or_create(**data)
+
+    course_activity = UserCourseActivity.objects.get(user=user_course_progress.user, 
+                                                    course=user_course_progress.course)
+    get_course_progress = TraineeCourseServices.get_course_progress(request.user.id, user_course_progress.course.id)
+    if get_course_progress == 100:
+      course_activity.completed_on = datetime.now(timezone.utc)
+      if TraineeCourseServices.get_collection_progress(request.user.id, collection_id) == 100:
+        UserCoursesEnrolled.objects.filter(user=request.user, collection_id=collection_id).update(
+          completed_on=datetime.now(timezone.utc),
+          is_completed=True
+        )
+      
     return user_course_progress
   
   @staticmethod
@@ -66,4 +90,13 @@ class TraineeCourseServices:
     progress_in_percent = (lessons_completed.count() / total_lessons) * 100
     return progress_in_percent
     
+
+  @staticmethod
+  def get_collection_progress(user_id, collection_id):
+    current_collection = UserCoursesEnrolled.objects.filter(user_id=user_id, collection_id=collection_id).first()
+    collection_courses = current_collection.collection.courses.all()
+    progress = 0
+    for course in collection_courses:
+      progress += TraineeCourseServices.get_course_progress(user_id, course.id)
+    return progress / collection_courses.count()
     
