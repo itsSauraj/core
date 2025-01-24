@@ -70,14 +70,13 @@ class TraineeCourseServices:
   def mark_lesson_as_completed(request, collection_id, data):
     user_course_progress, created = UserCourseProgress.objects.get_or_create(**data)
 
-    course_activity = UserCourseActivity.objects.get(user=user_course_progress.user, 
-                                                    course=user_course_progress.course)
     get_course_progress = TraineeCourseServices.get_course_progress(request.user.id, user_course_progress.course.id)
     if get_course_progress == 100:
-      course_activity.completed_on = datetime.now(timezone.utc)
+      UserCourseActivity.objects.filter(user=user_course_progress.user, course=user_course_progress.course).update(
+        completed_on=datetime.now(timezone.utc)
+      )
 
-      current_course_collection = UserCoursesEnrolled.objects.filter(
-        request.user.id, collection_id=collection_id)
+      current_course_collection = UserCoursesEnrolled.objects.filter(user=request.user.id, collection_id=collection_id)
 
       if TraineeCourseServices.get_collection_progress(current_course_collection.first()) == 100:
         current_course_collection.update(
@@ -140,16 +139,8 @@ class TraineeCourseServices:
   
   @staticmethod
   def generate_course_report(course, user_id):
-    is_started = False
-    started_on = None
-    is_completed = False
-    completed_on = None
-    modules=[]
-    lesson_serializer_context = {
-      user_id: user_id
-    }
-
     modules = ResponseReportModuleSerializer(course.modules, context={'user_id': user_id}, many=True).data
+    user_activity_obj = UserCourseActivity.objects.filter(user_id=user_id, course_id=course.id).first()
 
     return {
       'id': course.id, 
@@ -157,9 +148,9 @@ class TraineeCourseServices:
       'description': course.description,
       'duration': get_course_duration(course),
       'progress': TraineeCourseServices.get_course_progress(user_id, course.id),
-      'is_started': is_started,
-      'started_on': started_on,
-      'is_completed': is_completed,
-      'completed_on': completed_on,
+      'is_started': user_activity_obj.is_started,
+      'started_on': user_activity_obj.started_on,
+      'is_completed': user_activity_obj.is_completed,
+      'completed_on': user_activity_obj.completed_on,
       'modules': modules
     }

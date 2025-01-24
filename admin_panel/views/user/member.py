@@ -188,7 +188,6 @@ class MemberModules():
 
     context = {
       'trainee': ResponseUserSerializer(trainee).data,
-      'collections':  collection_data_list,
-      'other_data': enrolled_collections_data,
+      'collections':  collection_data_list
     }
     return Response(context, status=200)

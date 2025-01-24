@@ -133,9 +133,8 @@ class ResponseReportModuleSerializer(serializers.ModelSerializer):
     return get_module_duration(obj)
 
   def get_lessons(self, obj):
-    return ResponseCompletedLessonsSerializer(obj.get_all_lessons, context={'user_id': self.user_id}, many=True).data
-  
-
+    return ResponseCompletedLessonsSerializer(obj.get_all_lessons, 
+                                              context={'user_id': self.user_id}, many=True).data
   
 class ResponseCompletedLessonsSerializer(serializers.ModelSerializer):
   def __init__(self, *args, **kwargs):
