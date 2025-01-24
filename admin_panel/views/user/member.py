@@ -166,7 +166,10 @@ class MemberModules():
     GET /api/auth/user/member/<uuid:trainee_id>/report
     """
 
-    trainee = UserAPIService.get_trainee(trainee_id, request.user)
+    if request.user.groups.filter(name='Trainee').exists():
+      trainee = request.user
+    else:
+      trainee = UserAPIService.get_trainee(trainee_id, request.user)
 
     if not trainee:
       return Response("Not trainee not found", status=404)
@@ -176,7 +179,6 @@ class MemberModules():
     enrolled_collections_data = AdminReportCourseCollectionSerializer(enrolled_courses_collection, many=True).data
     
     serializer_context = {
-      "user": request.user,
       "trainee_id": trainee_id,
       "metadata": enrolled_collections_data
     }

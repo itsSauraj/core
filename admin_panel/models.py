@@ -198,11 +198,9 @@ class UserCourseActivity(BaseModel):
   def __str__(self):
     return f"{self.user.username} - {self.course.title} - {self.started_on} - {self.completed_on}"
   
-  @property
   def is_started(self):
     return self.started_on is not None
   
-  @property
   def is_completed(self):
     return self.completed_on is not None
 

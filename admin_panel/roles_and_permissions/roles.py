@@ -48,7 +48,8 @@ DEFAULT_ROLES = {
         permission_manager.COURSES_DELETE,
     ],
     "Trainee": [
-        permission_manager.COURSES_VIEW
+        permission_manager.COURSES_VIEW,
+        permission_manager.TRAINEE_VIEW,
     ]
 }
 

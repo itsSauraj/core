@@ -124,6 +124,7 @@ class TraineeCourseServices:
   @staticmethod
   def get_time_taken_to_complete(current_collection):
     start_date = current_collection.started_on
+    todays_date = datetime.now(timezone.utc)
     completed_on = current_collection.completed_on
     estimate_date = TraineeCourseServices.estimated_collection_completeion_date(current_collection)
 
@@ -133,7 +134,7 @@ class TraineeCourseServices:
     if completed_on:
       days_taken = (completed_on - start_date).days
     else:   
-      days_taken = (estimate_date - start_date).days
+      days_taken = (todays_date - start_date).days
 
     return days_taken
   
@@ -142,15 +143,26 @@ class TraineeCourseServices:
     modules = ResponseReportModuleSerializer(course.modules, context={'user_id': user_id}, many=True).data
     user_activity_obj = UserCourseActivity.objects.filter(user_id=user_id, course_id=course.id).first()
 
+    if user_activity_obj is None:
+      is_started = False
+      started_on = None
+      is_completed = False
+      completed_on = None
+    else:
+      is_started = user_activity_obj.is_started()
+      started_on = user_activity_obj.started_on
+      is_completed = user_activity_obj.is_completed()
+      completed_on = user_activity_obj.completed_on
+
     return {
       'id': course.id, 
       'title': course.title,
       'description': course.description,
       'duration': get_course_duration(course),
       'progress': TraineeCourseServices.get_course_progress(user_id, course.id),
-      'is_started': user_activity_obj.is_started,
-      'started_on': user_activity_obj.started_on,
-      'is_completed': user_activity_obj.is_completed,
-      'completed_on': user_activity_obj.completed_on,
+      'is_started': is_started,
+      'started_on': started_on,
+      'is_completed': is_completed,
+      'completed_on': completed_on,
       'modules': modules
     }

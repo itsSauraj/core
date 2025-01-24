@@ -45,6 +45,7 @@ class AdminResponseCourseGroupSerializer(ModelSerializer):
     courses = serializers.SerializerMethodField()
     duration = serializers.SerializerMethodField()
 
+    is_started = serializers.SerializerMethodField()
     started_on = serializers.SerializerMethodField()
     completed_on = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
@@ -63,11 +64,14 @@ class AdminResponseCourseGroupSerializer(ModelSerializer):
       model = CourseCollection
       fields = [
           'id', 'title', 'description', 
-          'duration', 'image', 'alloted_time', 
+          'duration', 'image', 'alloted_time', 'is_started',
           'started_on', 'completed_on', 'is_completed',
           'progress', 'days_taken', 'due_time', 'estimated_completion_date',
           'assigned_by', 'courses',
       ]
+
+    def get_is_started(self, obj):
+      return True if self.get_metadata_field(obj.id).get('started_on') else False
 
     def get_started_on(self, obj):
       return self.get_metadata_field(obj.id).get('started_on')
