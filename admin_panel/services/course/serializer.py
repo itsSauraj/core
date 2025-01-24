@@ -143,10 +143,15 @@ class ResponseCompletedLessonsSerializer(serializers.ModelSerializer):
   
   # UserCourseProgress
   completed = serializers.SerializerMethodField()
+  completed_on = serializers.SerializerMethodField()
 
   class Meta:
     model = CourseModuleLessons
-    fields = ['id', 'title', 'description', 'sequence', 'duration', 'completed']
+    fields = ['id', 'title', 'description', 'sequence', 'duration', 'completed', 'completed_on']
 
   def get_completed(self, obj):
     return UserCourseProgress.objects.filter(user_id=self.user_id, lesson_id=obj.id).exists()
+  
+  def get_completed_on(self, obj):
+    completed_lesson = UserCourseProgress.objects.filter(user_id=self.user_id, lesson_id=obj.id).first()
+    return completed_lesson.completed_on if completed_lesson else None
