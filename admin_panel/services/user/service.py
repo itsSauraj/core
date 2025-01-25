@@ -51,6 +51,15 @@ class UserAPIService:
     user.save()
 
   @staticmethod
+  def remove_dublicate_values(user_id, data):
+    user = UserAPIService.get_user_by_id(user_id)
+    unchanged_data = {}
+    for key, value in data.items():
+      if value != getattr(user, key):
+        unchanged_data[key] = value
+    return unchanged_data
+
+  @staticmethod
   def create(request, data, group=[]):
 
     user_permissions = request.user.get_all_permissions()
@@ -74,12 +83,8 @@ class UserAPIService:
   def update(request, data, user_id):
 
     user = UserAPIService.get_user_by_id(user_id)
-    serializer = UserSerializer(data)
 
-    if user != request.user and 'Admin' not in request.user.groups.all():
-      raise PermissionError('You do not have permission to update this user')
-
-    for key, value in serializer.data.items():
+    for key, value in data.items():
       setattr(user, key, value)
     user.save()
 

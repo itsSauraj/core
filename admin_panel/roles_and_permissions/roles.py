@@ -61,12 +61,14 @@ class IsInGroup(BasePermission):
         if not request.user.is_authenticated:
             raise PermissionDenied(detail="You must be logged in to access this resource.")
 
-        # Check if the user is an Admin
         if request.user.groups.filter(name="Admin").exists() or request.user.is_superuser:
             return True
+        
+        if isinstance(self.group_name, list):
+            if not request.user.groups.filter(name__in=self.group_name).exists():
+                raise PermissionDenied(detail=f"You must be in one of the following groups: {self.group_name} to access this resource.")
+            return True
 
-        # Check if the user belongs to the required group
         if not request.user.groups.filter(name=self.group_name).exists():
             raise PermissionDenied(detail=f"You must be in the '{self.group_name}' group to access this resource.")
         return True
-    

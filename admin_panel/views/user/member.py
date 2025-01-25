@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from admin_panel.roles_and_permissions.roles import IsInGroup
 from admin_panel.models import User
 
-from admin_panel.services.user.serializer import CreateUserRequestSerializer, ResponseUserSerializer
+from admin_panel.services.user.serializer import CreateUserRequestSerializer, UpdateUserRequestSerializer, \
+  ResponseUserSerializer
 from admin_panel.services.user.service import UserAPIService
 from admin_panel.services.course.service import CourseAPIService
 from admin_panel.services.trainee.admin_serializer import AdminReportCourseCollectionSerializer, \
@@ -24,7 +25,7 @@ class MemberAPIView(APIView):
     if self.request.method in ['POST', 'DELETE']:
       return [IsAuthenticated(), IsInGroup('Admin')]
     else:
-      return [IsAuthenticated(), IsInGroup('Mentor')]
+      return [IsAuthenticated()]
 
   def post(self, request):
     """ 
@@ -71,14 +72,24 @@ class MemberAPIView(APIView):
 
     return Response(context, status=200)
 
-  def patch(self, request, member_id):
+  def patch(self, request, member_id=None):
     """ 
     Update a mentor 
 
     Example:
     PATCH /api/auth/user/member/uuid
     """
-    serializer = CreateUserRequestSerializer(data=request.data)
+    if not member_id:
+      return Response("User ID is required", status=400)
+    
+    if member_id != request.user.id and 'Admin' not in [group.name for group in list(request.user.groups.all())]:
+      return Response("You are not authorized to perform this action", status=403)
+    
+    unchanged_data = UserAPIService.remove_dublicate_values(member_id, request.data)
+    if unchanged_data == {}:
+      return Response("No data to update", status=400)
+
+    serializer = UpdateUserRequestSerializer(data=unchanged_data, partial=True)
 
     if not serializer.is_valid():
       return Response(serializer.errors, status=400)
@@ -88,19 +99,14 @@ class MemberAPIView(APIView):
     except User.DoesNotExist:
       return Response("User not found", status=404)
 
-    context = {
-      "user": ResponseUserSerializer(member).data,
-      "message": "User updated successfully"
-    }
-
-    return Response(context, status=200)
+    return Response(ResponseUserSerializer(member).data, status=200)
 
   def delete(self, request, member_id=None):
     """ 
     Delete a mentor 
 
     Example:
-    DELETE /api/auth/user/member/uuid
+    DELETE /api/member/uuid
     or
     Example:
     body = UUID[]

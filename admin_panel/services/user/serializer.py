@@ -48,6 +48,27 @@ class CreateUserRequestSerializer(ModelSerializer):
 			pass
 
 		return data
+	
+class UpdateUserRequestSerializer(ModelSerializer):
+	"""
+	Takes data from the request and validates it
+	data = {
+		"employee_id": "123456",
+		"email": ""
+		"first_name": "John",
+		"last_name": "Doe"
+		"username": "johndoe",
+		"phone_number": "1234567890",
+		"address": "123, Example Street, Example City",
+		"birth_date": "2021-01-01",
+		"joining_date": "2021-01-01",
+	}
+	"""
+	
+	class Meta:
+		model = User
+		fields = ['employee_id', 'email', 'first_name', 'last_name', 
+						'username', 'phone_number', 'address', 'birth_date', 'joining_date']
 		
 class UserSerializer(ModelSerializer):
 	
