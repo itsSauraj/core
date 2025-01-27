@@ -40,6 +40,7 @@ urlpatterns = [
 
   ### For trainee to view course
   path('member/collection/', TraineeAPIView.get_all_assigned_collections, name='trainee_assigned_collections'),
+  path('trainee/collection/mini/<uuid:trainee_id>', TraineeAPIView.get_minified_user_collections, name='trainee_assigned_collections_mini'),
   path('member/<uuid:collection_id>/<uuid:course_id>', TraineeAPIView.user_course_actions, name='trainee_course_action'),
   path('member/action/lesson', TraineeAPIView.user_course_lessson_actions, name='trainee_course_lesson_action'),
 ]

@@ -6,16 +6,18 @@ from admin_panel.roles_and_permissions.roles import IsInGroup
 from admin_panel.roles_and_permissions.decorators import group_required
 
 from admin_panel.services.trainee.serializer import CreateUserCollectionSerializer, ReportCourseCollectionSerializer, \
-  CreateUserCourseActivitySerializer, CreateLessonProgressSerializer, ResponeUserCourseProgressSerializer, LessonLearnedSerializer
+  CreateUserCourseActivitySerializer, CreateLessonProgressSerializer, ResponeUserCourseProgressSerializer, \
+    LessonLearnedSerializer, DeleteUserCollectionSerializer, ResponseTraineeAssignedCollectionsMinifiedSerializer
 from admin_panel.services.trainee.service import TraineeCourseServices
 from admin_panel.services.course.service import CourseAPIService
+from admin_panel.services.user.service import UserAPIService
+from admin_panel.services.course.serializer import ResponseCollectionsMinifiedSerializer
 
 class TraineeCourseAPIView(APIView):
   def get_permissions(self):
     return [IsAuthenticated(), IsInGroup('Admin')]
     
   def post(self, request):
-    
     serializer = CreateUserCollectionSerializer(data=request.data)
 
     if not serializer.is_valid():
@@ -30,11 +32,14 @@ class TraineeCourseAPIView(APIView):
     return Response({"message": "Added to collection"}, status=201)
   
 
-  def delete(self, request, collection_id=None):
-    if collection_id is None:
-      return Response({"message": "Collection ID is required"}, status=400)
+  def delete(self, request):
+
+    serializer = DeleteUserCollectionSerializer(data=request.data)
+
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=400)
     
-    status = TraineeCourseServices.delete(request, collection_id)
+    status = TraineeCourseServices.delete(request, serializer.validated_data)
     if not status:
       return Response({"message": "Collection not found"}, status=404)
     
@@ -170,3 +175,36 @@ class TraineeAPIView():
     except Exception as e:
       return Response(False, status=404)
     return Response(True, status=200)
+
+  @staticmethod
+  @api_view(['GET'])
+  @group_required(['Admin'])
+  def get_minified_user_collections(request, trainee_id):
+
+    if trainee_id is None:
+      return Response({"message": "Trainee ID is required"}, status=400)
+    
+    try:
+        trainee = UserAPIService.get_trainee(trainee_id, request.user)
+        assigned_collections = trainee.enrolled_courses.all()
+    except AttributeError:
+        return Response({"message": "Trainee not found or has no enrolled courses"}, status=404)
+    
+    all_collections = CourseAPIService.get_all_collections(request.user)
+    un_assigned_collections = []
+    for collection in all_collections:
+        is_assigned = False
+        for assigned in assigned_collections:
+            if assigned.collection.id == collection.id:
+                is_assigned = True
+                break
+        if not is_assigned:
+            un_assigned_collections.append(collection)
+
+
+    context = {
+      "assigned_collections": ResponseTraineeAssignedCollectionsMinifiedSerializer(assigned_collections, many=True).data,
+      "available_collections": ResponseCollectionsMinifiedSerializer(un_assigned_collections, many=True).data
+    }
+
+    return Response(context, status=200)

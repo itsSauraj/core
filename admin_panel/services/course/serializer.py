@@ -155,3 +155,18 @@ class ResponseCompletedLessonsSerializer(serializers.ModelSerializer):
   def get_completed_on(self, obj):
     completed_lesson = UserCourseProgress.objects.filter(user_id=self.user_id, lesson_id=obj.id).first()
     return completed_lesson.completed_on if completed_lesson else None
+  
+
+class ResponseCollectionsMinifiedSerializer(ModelSerializer):
+  title = serializers.SerializerMethodField()
+  id = serializers.SerializerMethodField()
+
+  class Meta:
+    model = CourseCollection
+    fields = ['id', 'title']
+
+  def get_title(self, obj):
+    return obj.title
+
+  def get_id(self, obj):
+    return obj.id

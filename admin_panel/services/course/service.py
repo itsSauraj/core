@@ -4,7 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 
-from admin_panel.models import Course, CourseModules, CourseModuleLessons, UserCourseActivity
+from admin_panel.models import Course, CourseModules, CourseModuleLessons, \
+  UserCourseActivity, CourseCollection
 
 from .serializer import ResponseCourseSerializer, ResponseModuleStructureSerializer, \
   CreateLessonRequestSerializer, CreateModuleRequestSerializer, CourseDataSerializer
@@ -21,6 +22,10 @@ class CourseAPIService:
     except ObjectDoesNotExist:
       return None
         
+  @staticmethod
+  def get_all_collections(created_by=None):
+    return CourseCollection.objects.all().filter(created_by=created_by)
+
   @staticmethod
   def get_all_courses(created_by=None):
     return Course.objects.all().filter(created_by=created_by)

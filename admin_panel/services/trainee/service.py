@@ -42,12 +42,18 @@ class TraineeCourseServices:
       user.enrolled_courses.add(enrollment)
 
   @staticmethod
-  def delete(request, collection_id):
-    collection = TraineeCourseServices.get_enrollect_collection(collection_id, request.user)
-    if collection:
-      collection.delete()
-      return True
-    return False
+  def delete(request, data):
+    user_id = data['user']
+    collection_ids = data['collection']
+
+    for collection_id in collection_ids:
+      collection = UserCoursesEnrolled.objects.filter(user_id=user_id, collection_id=collection_id, 
+                                                      assigned_by=request.user)
+      if collection.exists():
+        collection.delete()
+      else:
+        return False
+    return True
   
 
   @staticmethod

@@ -24,6 +24,11 @@ class CreateUserCollectionSerializer(ModelSerializer):
       return collections
     return value
   
+class DeleteUserCollectionSerializer(serializers.Serializer):
+  user = serializers.UUIDField()
+  collection = serializers.ListField(child=serializers.UUIDField())
+
+
 class ReportCourseCollectionSerializer(ModelSerializer):
   collection = serializers.SerializerMethodField()
   progress = serializers.SerializerMethodField()
@@ -55,6 +60,20 @@ class ReportCourseCollectionSerializer(ModelSerializer):
   def assigned_by(self, obj):
     return obj.collection.created_by.username
 
+class ResponseTraineeAssignedCollectionsMinifiedSerializer(ModelSerializer):
+  title = serializers.SerializerMethodField()
+  id = serializers.SerializerMethodField()
+
+  class Meta:
+    model = UserCoursesEnrolled
+    fields = ['id', 'title']
+
+  def get_title(self, obj):
+    return obj.collection.title
+  
+  def get_id(self, obj):
+    return obj.collection.id
+  
 class ResponseTraineeAssignedCollections(ModelSerializer):
   collection = serializers.SerializerMethodField()
 
