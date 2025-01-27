@@ -82,9 +82,7 @@ class CourseCollectionAPIView(APIView):
       return Response(ResponseCourseGroupSerializer(course_collection).data, status=200)
     except ObjectDoesNotExist:
       return Response({"message": "Course not found"}, status=404)
-    
-  def put(self, request, collection_id=None):
-    return CourseCollectionModules.all_courses_in_collection(request, collection_id)
+
 
   def get(self, request, collection_id=None):
 
@@ -129,3 +127,19 @@ class CourseCollectionModules():
       return Response(courses, status=200)
     except ObjectDoesNotExist:
       return Response({"message": "Course not found"}, status=404)
+  
+  @staticmethod
+  @api_view(['PUT'])
+  @group_required('Admin')
+  def set_default_collection(request, collection_id):
+    if not collection_id:
+      return Response({"message": "Collection ID is required"}, status=400)
+    
+    collection = CourseCollectionAPIService.get(request.user, collection_id)
+
+    if not collection:
+      return Response({"message": "Collection not found"}, status=404)
+    
+    CourseCollectionAPIService.set_default_collection(request, collection)
+
+    return Response({"message": "Collection set as default"}, status=200)

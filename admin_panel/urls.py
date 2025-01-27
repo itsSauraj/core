@@ -23,6 +23,7 @@ urlpatterns = [
   #
   path('course/collection/', CourseCollectionAPIView.as_view(), name='course_collections_api'),
   path('course/collection/<uuid:collection_id>', CourseCollectionAPIView.as_view(), name='course_collection_api'),
+  path('course/collection/<uuid:collection_id>/default', CourseCollectionModules.set_default_collection, name='set_default_collection'),
   path('course/collection/<uuid:collection_id>/<uuid:course_id>', CourseCollectionModules.course_actions_collection, name='course_module_actions'),
 
   ## Module Management APIs
@@ -36,7 +37,6 @@ urlpatterns = [
 
   ### Trainee Course Management APIs
   path('trainee/course/', TraineeCourseAPIView.as_view(), name='trainee_course_api'),
-  path('trainee/course/<uuid:collection_id>', TraineeCourseAPIView.as_view(), name='trainee_course_api'),
 
   ### For trainee to view course
   path('member/collection/', TraineeAPIView.get_all_assigned_collections, name='trainee_assigned_collections'),

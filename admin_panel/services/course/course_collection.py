@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from admin_panel.models import CourseCollection, Course
-
+from admin_panel.services.user.service import UserAPIService
 
 
 class CourseCollectionAPIService:
@@ -78,3 +78,15 @@ class CourseCollectionAPIService:
     except Exception as e:
       raise ObjectDoesNotExist
       
+  
+  @staticmethod
+  def set_default_collection(request, collection):   
+    try:
+      if collection.is_default:
+        return Response({"message": "Collection is already default"}, status=200)
+      else:
+        request.user.default_collection = collection
+        request.user.save()
+        return Response({"message": "Collection set as default"}, status=200)
+    except ObjectDoesNotExist:
+      return Response({"message": "Collection not found"}, status=404)

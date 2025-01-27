@@ -41,6 +41,7 @@ class User(BaseModel, AbstractUser):
   created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
 
   enrolled_collections = models.ManyToManyField('CourseCollection', related_name='enrolled_users', blank=True)
+  default_collection = models.ForeignKey('CourseCollection', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_user')
 
   objects = CustomUserManager()
 
@@ -50,6 +51,10 @@ class User(BaseModel, AbstractUser):
   def save(self, *args, **kwargs):
     if not self.pk:  # Check if the user is being created
       self.set_password(self.password)  # Hash the password
+
+    if self.created_by is not None:
+      get_default_collection = self.created_by.default_collection
+      self.enrolled_collections.add(get_default_collection)
     super(User, self).save(*args, **kwargs)
 
   # Get all permissions of the user
@@ -171,6 +176,10 @@ class CourseCollection(BaseModel):
   @property
   def get_all_courses(self):
     return self.courses.all()
+  
+  @property
+  def is_default(self):
+    return self.created_by.default_collection == self
 
 
 class UserCoursesEnrolled(BaseModel):

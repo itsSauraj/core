@@ -98,10 +98,11 @@ class CreateRequestCourseGroupSerializer(ModelSerializer):
 class ResponseCourseGroupSerializer(ModelSerializer):
   courses = serializers.SerializerMethodField()
   duration = serializers.SerializerMethodField()
+  is_default = serializers.SerializerMethodField()
 
   class Meta:
     model = CourseCollection
-    fields = ['id', 'title', 'description', 'duration', 'image', 'alloted_time', 'courses']
+    fields = ['id', 'title', 'description', 'duration', 'image', 'alloted_time', 'courses', 'is_default']
 
   def get_courses(self, obj):
     return [
@@ -115,6 +116,9 @@ class ResponseCourseGroupSerializer(ModelSerializer):
   
   def get_duration(self, obj):
     return get_collection_duration(obj)
+  
+  def get_is_default(self, obj):
+    return obj.is_default
   
 
 class ResponseReportModuleSerializer(serializers.ModelSerializer):

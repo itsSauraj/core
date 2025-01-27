@@ -59,7 +59,7 @@ class ReportCourseCollectionSerializer(ModelSerializer):
 
   def assigned_by(self, obj):
     return obj.collection.created_by.username
-
+  
 class ResponseTraineeAssignedCollectionsMinifiedSerializer(ModelSerializer):
   title = serializers.SerializerMethodField()
   id = serializers.SerializerMethodField()
