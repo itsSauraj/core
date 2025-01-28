@@ -8,6 +8,7 @@ from admin_panel.models import CourseCollection, UserCoursesEnrolled, UserCourse
 from admin_panel.services.course.dependencies import get_course_duration
 from admin_panel.services.course.serializer import ResponseReportModuleSerializer
 from admin_panel.services.user.service import UserAPIService
+from admin_panel.services.notification.service import NotificationService
 
 
 class TraineeCourseServices:
@@ -79,9 +80,20 @@ class TraineeCourseServices:
     user_course_progress, created = UserCourseProgress.objects.get_or_create(**data)
 
     get_course_progress = TraineeCourseServices.get_course_progress(request.user.id, user_course_progress.course.id)
+
+
     if get_course_progress == 100:
       UserCourseActivity.objects.filter(user=user_course_progress.user, course=user_course_progress.course).update(
         completed_on=datetime.now(timezone.utc)
+      )
+
+      NotificationService.send_notification(
+        sender=request.user,
+        recipient=request.user.created_by,
+        message="{} {} has completed the course {} as current collection progress is {}"
+          .format(request.user.first_name, request.user.last_name, 
+                  user_course_progress.course.title, get_course_progress),
+        notification_type='success'
       )
 
       current_course_collection = UserCoursesEnrolled.objects.filter(user=request.user.id, collection_id=collection_id)
@@ -91,6 +103,15 @@ class TraineeCourseServices:
           completed_on=datetime.now(timezone.utc),
           is_completed=True
         )
+        NotificationService.send_notification(
+          sender=request.user,
+          recipient=request.user.created_by,
+          message="{} {} has completed the collection {}"
+            .format(request.user.first_name, request.user.last_name, 
+                    current_course_collection.first().collection.title),
+          notification_type='success'
+        )
+
       
     return user_course_progress
   

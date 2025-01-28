@@ -231,3 +231,27 @@ class UserCourseProgress(BaseModel):
 
   def get_completed_lessons(self, course):
     return self.objects.filter(course=course, completed_on__isnull=False)
+  
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = (
+        ('success', 'Success'),
+        ('info', 'Info'),
+        ('warning', 'Warning'),
+        ('error', 'Error'),
+    )
+
+    sender = models.ForeignKey(User,on_delete=models.CASCADE,related_name='sent_notifications')
+    recipient = models.ForeignKey(User,on_delete=models.CASCADE,related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    type = models.CharField(max_length=10, choices=NOTIFICATION_TYPES, default='info')
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.recipient.username} - {self.message[:50]}"

@@ -5,8 +5,17 @@ from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, Le
 from admin_panel.views.course.course_collection import CourseCollectionAPIView, CourseCollectionModules
 from admin_panel.views.trainee.controller import TraineeCourseAPIView, TraineeAPIView
 
+from rest_framework.routers import DefaultRouter
+from admin_panel.views.notifications import NotificationViewSet
+
+router = DefaultRouter()
+router.register(r'notifications', NotificationViewSet, basename='notification')
+
 
 urlpatterns = [
+  # Notification APIs
+  path('', include(router.urls)),
+
   # Admin User Management APIs
   path('auth/user/', include('admin_panel.user_urls')),
 
@@ -44,3 +53,4 @@ urlpatterns = [
   path('member/<uuid:collection_id>/<uuid:course_id>', TraineeAPIView.user_course_actions, name='trainee_course_action'),
   path('member/action/lesson', TraineeAPIView.user_course_lessson_actions, name='trainee_course_lesson_action'),
 ]
+

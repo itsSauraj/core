@@ -40,10 +40,8 @@ class UserAPIView(APIView):
     permissions = created_user.get_all_permissions()
 
     context = {
-      "username": user_serializer.data,
       "token": str(token),
-      "permissions": permissions,
-      "message": "User created successfully"
+      "user": user_serializer.data,
     }
     
     return Response(context, status=201)
