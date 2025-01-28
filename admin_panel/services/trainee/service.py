@@ -7,6 +7,8 @@ from admin_panel.models import CourseCollection, UserCoursesEnrolled, UserCourse
   UserCourseProgress, CourseModuleLessons
 from admin_panel.services.course.dependencies import get_course_duration
 from admin_panel.services.course.serializer import ResponseReportModuleSerializer
+from admin_panel.services.user.service import UserAPIService
+
 
 class TraineeCourseServices:
 
@@ -19,25 +21,25 @@ class TraineeCourseServices:
       return None
   
   @staticmethod
-  def create(request, data):
+  def create(assignee, data):
     user = data['user']
     collections = CourseCollection.objects.filter(id__in=data['collection'])
+
+    try:
+      prev_collections = user.enrolled_courses.values_list('collection_id', flat=True)
+    except Exception as e:
+      prev_collections = UserAPIService.get_user_by_id(user).enrolled_courses.values_list('collection_id', flat=True)
     
-    # Get previously enrolled collections
-    prev_collections = user.enrolled_courses.values_list('collection_id', flat=True)
-    
-    # Filter out already enrolled collections
     new_collections = [
       collection for collection in collections 
       if collection.id not in prev_collections
     ]
-    
-    # Create enrollments for new collections
+
     for collection in new_collections:
       enrollment = UserCoursesEnrolled.objects.create(
         user=user,
         collection=collection,
-        assigned_by=request.user
+        assigned_by=assignee
       )
       user.enrolled_courses.add(enrollment)
 

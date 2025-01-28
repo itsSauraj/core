@@ -27,7 +27,7 @@ class TraineeCourseAPIView(APIView):
       if collection.created_by != request.user:
         return Response({"message": "You can not assign collection of which you are not the owner"}, status=400)
     
-    TraineeCourseServices.create(request, serializer.validated_data)
+    TraineeCourseServices.create(request.user, serializer.validated_data)
     
     return Response({"message": "Added to collection"}, status=201)
   

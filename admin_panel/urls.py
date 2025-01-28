@@ -36,7 +36,7 @@ urlpatterns = [
 
 
   ### Trainee Course Management APIs
-  path('trainee/course/', TraineeCourseAPIView.as_view(), name='trainee_course_api'),
+  path('trainee/course/', TraineeCourseAPIView.as_view(), name='trainee_course_collection_api'),
 
   ### For trainee to view course
   path('member/collection/', TraineeAPIView.get_all_assigned_collections, name='trainee_assigned_collections'),
