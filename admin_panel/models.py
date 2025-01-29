@@ -233,7 +233,7 @@ class UserCourseProgress(BaseModel):
     return self.objects.filter(course=course, completed_on__isnull=False)
   
 
-class Notification(models.Model):
+class Notification(BaseModel):
     NOTIFICATION_TYPES = (
         ('success', 'Success'),
         ('info', 'Info'),
@@ -247,8 +247,6 @@ class Notification(models.Model):
     message = models.TextField()
     type = models.CharField(max_length=10, choices=NOTIFICATION_TYPES, default='info')
     read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from channels.layers import get_channel_layer
 
 from asgiref.sync import async_to_sync
@@ -17,7 +19,7 @@ class NotificationService:
         )
         
         serialized_notification = NotificationSerializer(notification).data
-        
+
         # Send to websocket
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(

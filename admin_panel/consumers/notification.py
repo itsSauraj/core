@@ -1,23 +1,20 @@
-# notifications/consumers.py
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-from django.contrib.auth import get_user_model
-
 from admin_panel.models import Notification
 from admin_panel.services.notification.serializer import NotificationSerializer
 
-User = get_user_model()
-
 class NotificationConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        if not self.scope["user"].is_authenticated:
-            await self.close()
-            return
 
-        self.user_id = self.scope["user"].id
+    def __init__(self, *args, **kwargs):
+        self.user_id = None
+        self.room_group_name = ""
+        super().__init__(*args, **kwargs)
+
+    async def connect(self):
+        self.user_id = self.scope["user_id"]
         self.room_group_name = f"user_{self.user_id}_notifications"
 
         # Join room group
@@ -27,8 +24,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
-        
-        # Send existing unread notifications
+
         unread_notifications = await self.get_unread_notifications()
         if unread_notifications:
             await self.send(text_data=json.dumps({
@@ -37,7 +33,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             }))
 
     async def disconnect(self, close_code):
-        # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -57,7 +52,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                 }))
 
     async def notification_message(self, event):
-        # Send notification to WebSocket
         await self.send(text_data=json.dumps({
             'type': 'new_notification',
             'notification': event['notification']
@@ -68,7 +62,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         notifications = Notification.objects.filter(
             recipient_id=self.user_id,
             read=False
-        ).order_by('-created_at')[:10]
+        ).order_by('-created_at')
         return NotificationSerializer(notifications, many=True).data
 
     @database_sync_to_async
