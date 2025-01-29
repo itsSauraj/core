@@ -24,4 +24,7 @@ This project is a comprehensive platform for managing trainees, courses, and ass
   * `python manage.py setup_roles`
 4. After that to the application run
   * `python manage.py runserver`
+  Note to run with websocket you will need to install redis for socket layering and
+  also run the application using the `gunicorn` asgi or `daphne` asgi configuration.
+  * `daphne -b 0.0.0.0 -p 8000 core.asgo:application`
   
