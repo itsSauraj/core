@@ -9,11 +9,12 @@ from .serializer import NotificationSerializer
 
 class NotificationService:
     @staticmethod
-    def send_notification(sender, recipient, message, notification_type='info'):
+    def send_notification(sender, recipient, title, message, notification_type='info'):
         # Create notification in database
         notification = Notification.objects.create(
             sender=sender,
             recipient=recipient,
+            title=title,
             message=message,
             type=notification_type
         )

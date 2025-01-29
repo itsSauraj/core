@@ -26,20 +26,20 @@ class NotificationViewSet(viewsets.ModelViewSet):
         
         data = serializer.validated_data
 
-        # recipient = data.get('recipient')
         recipient = request.user
+        title = data.get('title')
         message = data.get('message')
         notification_type = data.get('type', 'info')
         
-        notification = NotificationService.send_notification(sender, recipient, message, notification_type)
+        notification = NotificationService.send_notification(sender, recipient, title, message, notification_type)
         return Response(self.serializer_class(notification).data, status=status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['patch'])
     def mark_all_as_read(self, request):
         self.get_queryset().update(read=True)
         return Response(status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['put'])
     def mark_as_read(self, request, pk=None):
         notification = self.get_object()
         notification.read = True

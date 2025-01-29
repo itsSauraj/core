@@ -27,10 +27,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         unread_notifications = await self.get_unread_notifications()
         if unread_notifications:
-            await self.send(text_data=json.dumps({
-                'type': 'initial_notifications',
-                'notifications': unread_notifications
-            }))
+            await self.send(text_data=json.dumps(unread_notifications))
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -63,7 +60,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             recipient_id=self.user_id,
             read=False
         ).order_by('-created_at')
-        return NotificationSerializer(notifications, many=True).data
+        return {
+            'type': 'initial_notifications',
+            'notifications': NotificationSerializer(notifications, many=True).data
+        }
 
     @database_sync_to_async
     def mark_notification_as_read(self, notification_id):
