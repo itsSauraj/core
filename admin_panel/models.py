@@ -71,7 +71,11 @@ class User(BaseModel, AbstractUser):
   
   # Get all courses of the user
   def get_created_courses(self):
-    return self.course_set.all()
+    return self.course.all()
+  
+  # Get all collections of the user
+  def get_created_collections(self):
+    return self.collections.all()
 
   # Get all collections coures of the user
   def get_enrolled_courses_list(self):
@@ -194,7 +198,7 @@ class UserCoursesEnrolled(BaseModel):
 
   def __str__(self):
     return f"{self.user.username} - {self.collection.title}"
-  
+
   def save(self, *args, **kwargs):
     super(UserCoursesEnrolled, self).save(*args, **kwargs)
 

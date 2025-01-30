@@ -44,6 +44,10 @@ class UserAPIService:
     return UserAPIService.get_user_by_id(user_id).get_created_courses()
   
   @staticmethod
+  def get_created_collections(user_id):
+    return UserAPIService.get_user_by_id(user_id).get_created_collections()
+  
+  @staticmethod
   def add_user_to_group(user, group, many=False):
     if many:
       for group_name in group:

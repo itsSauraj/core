@@ -7,13 +7,18 @@ from admin_panel.views.trainee.controller import TraineeCourseAPIView, TraineeAP
 
 from rest_framework.routers import DefaultRouter
 from admin_panel.views.notifications import NotificationViewSet
+from admin_panel.views.dashboard import DashboardViewSet
 
 router = DefaultRouter()
+
+# Registering ViewSets Notifications
 router.register(r'notifications', NotificationViewSet, basename='notification')
 
+# Registering ViewSets Dashboard
+router.register(r'dashboard', DashboardViewSet, basename='dashboard')
 
 urlpatterns = [
-  # Notification APIs
+  # Router ViewSet APIs
   path('', include(router.urls)),
 
   # Admin User Management APIs
@@ -22,6 +27,7 @@ urlpatterns = [
   path('member/', MemberAPIView.as_view(), name='members_api'),
   path('member/<uuid:member_id>', MemberAPIView.as_view(), name='mentor_id_apis'),
 
+  # Member Management APIs
   path('user/mentor/', MemberModules.get_all_mentors, name='get_all_mentors'),
   path('user/trainee/', MemberModules.get_all_trainees, name='get_all_trainees'),
   path('user/trainee/<uuid:trainee_id>/report', MemberModules.generate_report, name='generate_report'),
@@ -29,7 +35,8 @@ urlpatterns = [
   # Course Management APIs  
   path('course/', CourseAPIView.as_view(), name='course_api'),
   path('course/<uuid:course_id>', CourseAPIView.as_view(), name='course_api_with_id'),
-  #
+
+  # Course Collection Management APIs
   path('course/collection/', CourseCollectionAPIView.as_view(), name='course_collections_api'),
   path('course/collection/<uuid:collection_id>', CourseCollectionAPIView.as_view(), name='course_collection_api'),
   path('course/collection/<uuid:collection_id>/default', CourseCollectionModules.set_default_collection, name='set_default_collection'),
@@ -42,7 +49,6 @@ urlpatterns = [
   ### Lesson Management APIs
   path('course/<uuid:course_id>/module/<uuid:module_id>/lesson/', LessonAPIView.as_view(), name='lesson_api'),
   path('course/<uuid:course_id>/module/<uuid:module_id>/lesson/<uuid:lesson_id>', LessonAPIView.as_view(), name='lesson_api'),
-
 
   ### Trainee Course Management APIs
   path('trainee/course/', TraineeCourseAPIView.as_view(), name='trainee_course_collection_api'),
