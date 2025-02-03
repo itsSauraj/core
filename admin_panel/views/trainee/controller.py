@@ -137,7 +137,7 @@ class TraineeAPIView():
 
 
   @staticmethod
-  @api_view(['POST'])
+  @api_view(['POST', 'DELETE'])
   @group_required(['Trainee', 'Admin'])
   def user_course_lessson_actions(request):
 
@@ -150,7 +150,10 @@ class TraineeAPIView():
 
     if request.method == 'POST':
       return TraineeAPIView.mark_lesson_as_completed(request, validated_data['collection_id'],
-                                        validated_data['course_id'], validated_data['lesson_id']) 
+                                        validated_data['course_id'], validated_data['lesson_id'])
+    elif request.method == 'DELETE':
+      return TraineeAPIView.unmark_lesson_as_completed(request, validated_data['collection_id'],
+                                                       validated_data['course_id'], validated_data['lesson_id'])
     else:
       return Response({"message": "Method not allowed"}, status=405)
     
@@ -170,6 +173,28 @@ class TraineeAPIView():
     
     try:
       user_course_progress = TraineeCourseServices.mark_lesson_as_completed(request, collection_id, serializer.validated_data)
+      if user_course_progress is None:
+        return Response({"message": "Lesson not found"}, status=404)
+    except Exception as e:
+      return Response(False, status=404)
+    return Response(True, status=200)
+  
+  @staticmethod
+  def unmark_lesson_as_completed(request, collection_id, course_id, lesson_id):
+    
+    requested_data = {
+      "course": course_id,
+      "lesson": lesson_id,
+      "user": request.user.id,
+    }
+
+    serializer = CreateLessonProgressSerializer(data=requested_data)
+
+    if not serializer.is_valid():
+      return Response(serializer.errors, status=400)
+    
+    try:
+      user_course_progress = TraineeCourseServices.unmark_lesson_as_completed(request, collection_id, serializer.validated_data)
       if user_course_progress is None:
         return Response({"message": "Lesson not found"}, status=404)
     except Exception as e:

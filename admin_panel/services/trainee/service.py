@@ -81,7 +81,6 @@ class TraineeCourseServices:
 
     get_course_progress = TraineeCourseServices.get_course_progress(request.user.id, user_course_progress.course.id)
 
-
     if get_course_progress == 100:
       UserCourseActivity.objects.filter(user=user_course_progress.user, course=user_course_progress.course).update(
         completed_on=datetime.now(timezone.utc)
@@ -114,8 +113,33 @@ class TraineeCourseServices:
           notification_type='success'
         )
 
-      
     return user_course_progress
+  
+  @staticmethod
+  def unmark_lesson_as_completed(request, collection_id, data):
+    user_course_progress = UserCourseProgress.objects.filter(**data)
+
+    if user_course_progress.exists():
+      get_course_progress = TraineeCourseServices.get_course_progress(request.user.id, user_course_progress.first().course.id)
+
+      if get_course_progress == 100:
+        UserCourseActivity.objects.filter(user=user_course_progress.first().user, course=user_course_progress.first().course).update(
+          completed_on=None
+        )
+
+        current_course_collection = UserCoursesEnrolled.objects.filter(user=request.user.id, collection_id=collection_id)
+
+        if TraineeCourseServices.get_collection_progress(current_course_collection.first()) == 100:
+          current_course_collection.update(
+            completed_on=None,
+            is_completed=False
+          )
+
+        user_course_progress.delete()
+
+    else:
+      return False
+    return True
   
   @staticmethod
   def get_completed_lessons(user_id, course_id):
