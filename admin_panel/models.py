@@ -177,6 +177,9 @@ class CourseCollection(BaseModel):
   def save(self, *args, **kwargs):
     super(CourseCollection, self).save(*args, **kwargs)
 
+  def enrollments(self):
+    return self.enrolled_users_collection.all()
+
   @property
   def get_all_courses(self):
     return self.courses.all()
@@ -188,7 +191,7 @@ class CourseCollection(BaseModel):
 
 class UserCoursesEnrolled(BaseModel):
   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrolled_courses')
-  collection = models.ForeignKey(CourseCollection, on_delete=models.CASCADE)
+  collection = models.ForeignKey(CourseCollection, on_delete=models.CASCADE, related_name='enrolled_users_collection')
   enrolled_on = models.DateTimeField(('enrolled on'), auto_now_add=True)
   started_on = models.DateTimeField(('started on'), null=True, blank=True)
   completed_on = models.DateTimeField(('completed on'), null=True, blank=True)
@@ -201,6 +204,12 @@ class UserCoursesEnrolled(BaseModel):
 
   def save(self, *args, **kwargs):
     super(UserCoursesEnrolled, self).save(*args, **kwargs)
+
+  def users_started_course(self, course):
+    return self.objects.filter(collection=course, started_on__isnull=False)
+  
+  def users_completed_course(self, course):
+    return self.objects.filter(collection=course, completed_on__isnull=False)
 
 class UserCourseActivity(BaseModel):
   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_activity')

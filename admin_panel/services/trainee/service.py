@@ -90,6 +90,7 @@ class TraineeCourseServices:
       NotificationService.send_notification(
         sender=request.user,
         recipient=request.user.created_by,
+        title="Course Completed",
         message="{} {} has completed the course {} as current collection progress is {}"
           .format(request.user.first_name, request.user.last_name, 
                   user_course_progress.course.title, get_course_progress),
@@ -106,6 +107,7 @@ class TraineeCourseServices:
         NotificationService.send_notification(
           sender=request.user,
           recipient=request.user.created_by,
+          title="Collection Completed",
           message="{} {} has completed the collection {}"
             .format(request.user.first_name, request.user.last_name, 
                     current_course_collection.first().collection.title),
