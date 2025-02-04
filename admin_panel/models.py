@@ -86,6 +86,7 @@ class User(BaseModel, AbstractUser):
     return courses_list
 
 class Course(BaseModel):
+  image = models.ImageField(upload_to=rename_file, null=True, blank=True)
   title = models.CharField(('course title'), max_length=255, null=False, blank=False)
   description = models.TextField(('course description'), null=True, blank=True)
   created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='course')

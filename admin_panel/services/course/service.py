@@ -102,8 +102,9 @@ class CourseAPIService:
 
       for lesson in module.get('lessons', []):
         lesson['module'] = created_module
-        hours, minutes, seconds = map(int, lesson['duration'].split(':'))
-        lesson['duration'] = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        lesson['duration'] = timedelta(hours=int(lesson['hours']), 
+                                      minutes=int(lesson['minutes']), 
+                                      seconds=int(lesson['seconds']))
         CourseAPIService.create_lesson(request, course.id, created_module.id, CreateLessonRequestSerializer(lesson).data)
 
     return course

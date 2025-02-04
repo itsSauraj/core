@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from admin_panel.roles_and_permissions.roles import IsInGroup
 
@@ -16,6 +17,11 @@ from rest_framework.views import APIView
 
 class CourseAPIView(APIView):
 
+  def get_parsers(self):
+    if self.request.method == 'POST':
+      return [MultiPartParser(), FormParser()]
+    return super().get_parsers()
+
   def get_permissions(self):
     if self.request.method in ['POST', 'DELETE', 'PATCH']:
       return [IsAuthenticated(), IsInGroup('Admin')]
@@ -28,9 +34,17 @@ class CourseAPIView(APIView):
     
     if not serializer.is_valid():
       return Response(serializer.errors, status=400)
+    
+    validated_data = {
+      "course": {
+        "title": serializer.validated_data.get('title'),
+        "description": serializer.validated_data.get('description')
+      },
+      "modules": serializer.validated_data.get('modules')
+    }
 
     try:
-      created_course = CourseAPIService.import_course(request, data=serializer.validated_data)
+      created_course = CourseAPIService.import_course(request, data=validated_data)
       return Response(ResponseCourseSerializer(created_course).data, status=201)
     except Exception as e:
       print(e)

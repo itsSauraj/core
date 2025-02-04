@@ -9,7 +9,7 @@ class CreateCourseRequestSerializer(ModelSerializer):
   
   class Meta:
     model = Course
-    fields = ['title', 'description']
+    fields = ['title', 'description', 'image']
 
 
 class CreateModuleRequestSerializer(ModelSerializer):
@@ -27,7 +27,9 @@ class CreateLessonRequestSerializer(ModelSerializer):
 
     
 class CourseDataSerializer(serializers.Serializer):
-  course = CreateCourseRequestSerializer()
+  image = serializers.ImageField(required=False)
+  title = serializers.CharField(required=True, max_length=255)
+  description = serializers.CharField(required=True)
   modules = serializers.ListField(child=serializers.DictField())
 
   def validate_modules(self, value):
@@ -45,12 +47,8 @@ class CourseDataSerializer(serializers.Serializer):
     return value
 
   def validate(self, data):
-    course_serializer = CreateCourseRequestSerializer(data=data['course'])
-    course_serializer.is_valid(raise_exception=True)
     self.validate_modules(data['modules'])
     return data
-
-
 
 # Respsonse serializers
 class ResponseCourseSerializer(ModelSerializer):
