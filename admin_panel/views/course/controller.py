@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -30,17 +32,24 @@ class CourseAPIView(APIView):
 
   def post(self, request):
     
-    serializer = CourseDataSerializer(data=request.data)
-    
+    send_data = request.data.copy()
+    try:
+      send_data['modules'] = json.loads(request.data["modules"])
+    except Exception as e:
+      return Response({"message": "Invalid Form Data"}, status=400)
+
+    serializer = CourseDataSerializer(data=send_data)
+
     if not serializer.is_valid():
       return Response(serializer.errors, status=400)
-    
+
     validated_data = {
       "course": {
+        "image": serializer.validated_data.get('image'),
         "title": serializer.validated_data.get('title'),
         "description": serializer.validated_data.get('description')
       },
-      "modules": serializer.validated_data.get('modules')
+      "modules": send_data.get("modules")
     }
 
     try:

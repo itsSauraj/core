@@ -70,6 +70,15 @@ class TraineeCourseServices:
       EnrolledCollection.update(
         started_on=datetime.now(timezone.utc)
       )
+      NotificationService.send_notification(
+        sender=request.user,
+        recipient=request.user.created_by,
+        title="Course Started",
+        message="{} {} has started the course {}"
+          .format(request.user.first_name, request.user.last_name, 
+                  EnrolledCollection.first().collection.title),
+        notification_type='success'
+      )
 
     user_course_activity, created = UserCourseActivity.objects.get_or_create(**data)
     return user_course_activity
@@ -135,7 +144,7 @@ class TraineeCourseServices:
             is_completed=False
           )
 
-        user_course_progress.delete()
+      user_course_progress.delete()
 
     else:
       return False
