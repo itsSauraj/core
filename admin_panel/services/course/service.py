@@ -1,8 +1,6 @@
 from datetime import timedelta
 
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import status
-from rest_framework.response import Response
 
 from admin_panel.models import Course, CourseModules, CourseModuleLessons, \
   UserCourseActivity, CourseCollection
@@ -10,7 +8,7 @@ from admin_panel.models import Course, CourseModules, CourseModuleLessons, \
 from .serializer import ResponseCourseSerializer, ResponseModuleStructureSerializer, \
   CreateLessonRequestSerializer, CreateModuleRequestSerializer, CourseDataSerializer
 
-from .dependencies import get_course_duration, get_module_duration, get_all_module_contents
+from .dependencies import get_module_duration
 
 class CourseAPIService:
 
@@ -72,14 +70,20 @@ class CourseAPIService:
   @staticmethod
   def get_all_module_contents_recursive(module):
     module_structure = {
-      'metadata': None,
+      'tilte': module.title,
+      'description': module.description,
+      'duration': None,
       'sub_modules': [],
       'lessons': []
     }
 
-    module_data = CreateModuleRequestSerializer(module).data
+    module_data = CreateModuleRequestSerializer(module).data 
+
+    module_structure['title'] = module_data['title']
+    module_structure['description'] = module_data['description']
+    module_data['sequence'] = module_data['sequence']
     module_data['duration'] = get_module_duration(module)
-    module_structure['metadata'] = module_data
+
     #lessson
     module_structure['lessons'] = CreateLessonRequestSerializer(module.get_all_lessons, many=True).data
 
@@ -95,10 +99,13 @@ class CourseAPIService:
   @staticmethod
   def import_course(request, data):
     course = CourseAPIService.create(request, data['course'])
-
-    for module in data['modules']:
-      module['course'] = course
-      created_module = CourseAPIService.create_module(request, course.id, CreateModuleRequestSerializer(module).data)
+    CourseAPIService.import_module(request, course, data['modules'])
+    return course
+  
+  @staticmethod
+  def import_module(request, course, modules, parent_module=None):
+    for module in modules:
+      created_module = CourseAPIService.create_module(request, course.id, parent_module, CreateModuleRequestSerializer(module).data)
 
       for lesson in module.get('lessons', []):
         lesson['module'] = created_module
@@ -107,7 +114,10 @@ class CourseAPIService:
                                       seconds=int(lesson['seconds']))
         CourseAPIService.create_lesson(request, course.id, created_module.id, CreateLessonRequestSerializer(lesson).data)
 
-    return course
+      if 'sub_modules' in module:
+        CourseAPIService.import_module(request, course, module['sub_modules'], created_module)
+
+    return True
 
 
   @staticmethod
@@ -134,14 +144,11 @@ class CourseAPIService:
     return course
 
   @staticmethod
-  def create_module(request, course_id, data):
-
-    course = CourseAPIService.get_course_by_id(course_id, request.user)
-
-    if course is None:
-      return None
-
-    module = CourseModules(**data, course=course)
+  def create_module(request, course_id, parent_module, data):
+    if parent_module:
+      module = CourseModules(**data, course_id=course_id, parent_module_id=parent_module.id)
+    else:
+      module = CourseModules(**data, course_id=course_id)
     module.save()
     return module
   
@@ -181,7 +188,11 @@ class CourseAPIService:
       module_structure.append(CourseAPIService.get_all_module_contents_recursive(module))
 
     return {
-      "metadata": metadata,
+      "id": metadata['id'],
+      "title": metadata['title'],
+      "description": metadata['description'],
+      "duration": metadata['duration'],
+      "image": metadata['image'],
       "modules": module_structure,
     }
 

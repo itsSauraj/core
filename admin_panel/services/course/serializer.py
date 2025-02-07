@@ -26,8 +26,6 @@ class CreateLessonRequestSerializer(ModelSerializer):
     fields = ['id', 'title', 'description', 'sequence', 'duration']
 
 
-
-
 class CourseDataSerializer(serializers.Serializer):
     image = serializers.ImageField(required=False)
     title = serializers.CharField(required=True, max_length=255)
