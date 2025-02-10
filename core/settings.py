@@ -212,6 +212,8 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=7),
 }
 
+
+ASYNC_EMAILS = os.getenv('ASYNC_EMAILS', 'False').lower() == 'true'
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
@@ -222,4 +224,3 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
-SEND_CONTACT_US_EMAIL_TO_EMAIL = os.environ.get('SEND_CONTACT_US_EMAIL_TO_EMAIL')

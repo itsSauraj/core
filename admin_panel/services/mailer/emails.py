@@ -14,22 +14,23 @@ def send_user_verification_email(user_id):
     mail_subject = 'Welcome to Scoop Investment, please verify your email address.'
     html_message = render_to_string('emails/signup-verification.html', {
         'user': user,
-    })
-    plain_message = strip_tags(html_message)
-    send_mail(mail_subject, plain_message, settings.SENDER_EMAIL, [user.email],
-                   html_message=html_message)
-
-def send_admin_verification_email(user_id):
-    user = User.objects.get(pk=user_id)
-
-    mail_subject = 'Welcome to Scoop Investment, please verify your email address.'
-    html_message = render_to_string('emails/signup-verification.html', {
-        'user': user,
         'otp': 123456, #TODO: create otp generator
     })
     plain_message = strip_tags(html_message)
     send_mail(mail_subject, plain_message, settings.SENDER_EMAIL, [user.email],
                    html_message=html_message)
+
+# def send_admin_verification_email(user_id):
+#     user = User.objects.get(pk=user_id)
+
+#     mail_subject = 'Welcome to Scoop Investment, please verify your email address.'
+#     html_message = render_to_string('emails/signup-verification.html', {
+#         'user': user,
+#         'otp': 123456, #TODO: create otp generator
+#     })
+#     plain_message = strip_tags(html_message)
+#     send_mail(mail_subject, plain_message, settings.SENDER_EMAIL, [user.email],
+#                    html_message=html_message)
     
 def send_user_password_reset_email(user_id):
     user = User.objects.get(pk=user_id)
