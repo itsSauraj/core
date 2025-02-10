@@ -11,7 +11,6 @@ class NotificationService:
 
 	@staticmethod
 	def send_notification(sender, recipient, title, message, notification_type='info'):
-		# Create notification in database
 		notification = Notification.objects.create(
 			sender=sender,
 			recipient=recipient,

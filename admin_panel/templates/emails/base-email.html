@@ -1,0 +1,51 @@
+{% load static %}
+
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap");
+</style>
+
+<body style="
+    background: #c2dae4;
+    margin: 0px;
+    padding: 16px;
+    font-family: 'Lora', serif;
+    box-sizing: border-box;
+">
+
+    <hr style="width: 90%; margin: auto; border: 1px solid #2c5464" />
+    <div>{% block content %}{% endblock content %}</div>
+    <br>
+    <div>
+        <table style="
+                table-layout: fixed;
+                width: 100%;
+                box-sizing: border-box;
+                width: 100%;
+        ">
+            <tbody style="text-align: center">
+                <tr>
+                    <td style="padding:0px">
+                        <table style="
+                            padding:25px 0;
+                        ">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p style="
+                                                font-size: 11px;
+                                                width: 100%;
+                                                margin: 0;
+                                                box-sizing: border-box;
+                                                ">
+                                            Please do not respond to this email.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>

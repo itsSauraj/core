@@ -1,0 +1,27 @@
+{% extends 'emails/base-email.html' %}
+{% block content %}
+<div style="background-color:#f6f6f6;padding:35px 75px">
+    <div style="margin-top:0">
+        <p style="width:100%;margin:0;box-sizing:border-box">Hi {{ user }},</p>
+    </div>
+    <div style="margin-top:25px">
+        <p style="width:100%;margin:0;box-sizing:border-box">We are contacting you to verify your account with our
+            service. As
+            part of our security measures, we require all users to confirm their account information to ensure the
+            safety
+            and security of our platform.</p>
+    </div>
+    <div style="margin-top:25px">
+        <p style="width:100%;margin:0;box-sizing:border-box">To complete the verification process, please click on the
+            verification OTP below.</p>
+    </div>
+    <div style="margin-top:25px">
+        {{  otp }}
+    </div>
+    <div style="margin-top:25px">
+        <p style="width:100%;margin:0;box-sizing:border-box;color:#ccc;font-style:italic">
+            ** This is an auto-generated email. Please do not reply to this
+            email.**</p>
+    </div>
+</div>
+{% endblock content %}
