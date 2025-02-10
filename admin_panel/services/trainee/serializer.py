@@ -63,16 +63,20 @@ class ReportCourseCollectionSerializer(ModelSerializer):
 class ResponseTraineeAssignedCollectionsMinifiedSerializer(ModelSerializer):
   title = serializers.SerializerMethodField()
   id = serializers.SerializerMethodField()
+  is_default = serializers.SerializerMethodField()
 
   class Meta:
     model = UserCoursesEnrolled
-    fields = ['id', 'title']
+    fields = ['id', 'title', 'is_default']
 
   def get_title(self, obj):
     return obj.collection.title
   
   def get_id(self, obj):
     return obj.collection.id
+  
+  def get_is_default(self, obj):
+    return obj.collection.is_default
   
 class ResponseTraineeAssignedCollections(ModelSerializer):
   collection = serializers.SerializerMethodField()

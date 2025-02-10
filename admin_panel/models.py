@@ -30,6 +30,7 @@ class BaseModel(TimeStampedModel, SoftDeleteModel):
     
 
 class User(BaseModel, AbstractUser):
+  avatar = models.ImageField(upload_to=rename_file, null=True, blank=True)
   phone_number = models.CharField(('phone number'),max_length=15, null=True, blank=True)
   birth_date = models.DateField(('birth date'), null=True, blank=True)
   address = models.TextField(('address'), null=True, blank=True)

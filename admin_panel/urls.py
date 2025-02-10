@@ -1,6 +1,7 @@
 from django.urls import path, include
 
 from admin_panel.views.user.member import MemberAPIView, MemberModules
+from admin_panel.views.user.profile import ProfileAPIViewSet
 from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, LessonAPIView
 from admin_panel.views.course.course_collection import CourseCollectionAPIView, CourseCollectionModules
 from admin_panel.views.trainee.controller import TraineeCourseAPIView, TraineeAPIView
@@ -17,6 +18,9 @@ router.register(r'notifications', NotificationViewSet, basename='notification')
 # Registering ViewSets Dashboard
 router.register(r'dashboard', DashboardViewSet, basename='dashboard')
 
+# Registering ViewSets Profile
+router.register(r'profile', ProfileAPIViewSet, basename='profile')
+
 urlpatterns = [
   # Router ViewSet APIs
   path('', include(router.urls)),
@@ -24,10 +28,9 @@ urlpatterns = [
   # Admin User Management APIs
   path('auth/user/', include('admin_panel.user_urls')),
 
-  path('member/', MemberAPIView.as_view(), name='members_api'),
-  path('member/<uuid:member_id>', MemberAPIView.as_view(), name='mentor_id_apis'),
-
   # Member Management APIs
+  path('member/<uuid:member_id>', MemberAPIView.as_view(), name='mentor_id_apis'),
+  path('member/', MemberAPIView.as_view(), name='members_api'),
   path('user/mentor/', MemberModules.get_all_mentors, name='get_all_mentors'),
   path('user/trainee/', MemberModules.get_all_trainees, name='get_all_trainees'),
   path('user/trainee/<uuid:trainee_id>/report', MemberModules.generate_report, name='generate_report'),

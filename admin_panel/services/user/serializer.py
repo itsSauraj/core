@@ -82,7 +82,7 @@ class ResponseUserSerializer(ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['employee_id', 'id', 'username', 'first_name', 'last_name', 'email', 
-						'address', 'birth_date', 'phone_number', 'joining_date', 'groups']
+						'address', 'birth_date', 'phone_number', 'joining_date', 'groups', 'avatar']
 	
 	def get_groups(self, obj):
 		return [group.name.lower() for group in obj.groups.all()]

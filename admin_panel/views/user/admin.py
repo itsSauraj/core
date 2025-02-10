@@ -1,17 +1,18 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework_simplejwt.tokens import SlidingToken
 
 from admin_panel.roles_and_permissions.roles import IsInGroup
 from admin_panel.models import User
 
 from admin_panel.services.user.serializer import CreateUserRequestSerializer, ResponseUserSerializer
 from admin_panel.services.user.service import UserAPIService
-from rest_framework_simplejwt.tokens import SlidingToken
 
 
 class UserAPIView(APIView):
-  """ Handles user creation, fetching, updating and deletion """
   def get_permissions(self):
     if self.request.method == 'POST':
         return [AllowAny()]
@@ -37,7 +38,6 @@ class UserAPIView(APIView):
     created_user = UserAPIService.create(request, serializer.validated_data, group="Admin")
     user_serializer = ResponseUserSerializer(created_user)
     token = SlidingToken.for_user(user_serializer.instance)
-    permissions = created_user.get_all_permissions()
 
     context = {
       "token": str(token),
@@ -45,16 +45,6 @@ class UserAPIView(APIView):
     }
     
     return Response(context, status=201)
-
-  def get(self, request):
-    """ Fetch a user """
-    # TODO: Implement admin user fetching
-    return Response('Fetched user is working', status=200)
-
-  def patch(self, request):
-    """ Update a user """
-    # TODO: Implement admin user update
-    return Response("User Updaed", status=200)
 
   def delete(self, request, id):
     """ Delete a user """

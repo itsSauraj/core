@@ -168,7 +168,10 @@ class TraineeCourseServices:
     progress = 0
     for course in collection_courses:
       progress += TraineeCourseServices.get_course_progress(current_collection.user.id, course.id)
-    return round(progress / collection_courses.count(), 2)
+    course_count = collection_courses.count()
+    if course_count == 0:
+        return 0
+    return round(progress / course_count, 2)
     
   @staticmethod
   def estimated_collection_completeion_date(current_collection):

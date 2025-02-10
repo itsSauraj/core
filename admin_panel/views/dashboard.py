@@ -11,9 +11,6 @@ from admin_panel.services.dashboard.service import DashboardService
 class DashboardViewSet(viewsets.ModelViewSet):
 	def get_permissions(self):
 		return [IsAuthenticated(), IsInGroup('Admin')]
-
-	def get_queryset(self):
-		pass
 	
 	@action(detail=False, methods=['get'])
 	def get_report(self, request):

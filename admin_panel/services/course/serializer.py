@@ -143,13 +143,17 @@ class ResponseCompletedLessonsSerializer(serializers.ModelSerializer):
 class ResponseCollectionsMinifiedSerializer(ModelSerializer):
   title = serializers.SerializerMethodField()
   id = serializers.SerializerMethodField()
+  is_default = serializers.SerializerMethodField()
 
   class Meta:
     model = CourseCollection
-    fields = ['id', 'title']
+    fields = ['id', 'title', 'is_default']
 
   def get_title(self, obj):
     return obj.title
 
   def get_id(self, obj):
     return obj.id
+  
+  def get_is_default(self, obj):
+    return obj.is_default
