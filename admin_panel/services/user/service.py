@@ -72,7 +72,10 @@ class UserAPIService:
     if 'Admin' not in group and not all(permission in user_permissions for permission in required_permissions):
         raise PermissionError('You do not have permission to create a user')
 
-    user = User.objects.create_user(**serializer.data)
+    try:
+      user = User.objects.create_user(**serializer.data)
+    except Exception as e:
+      return False
     post_save.send(sender=User, instance=user, created=True, groups=group, assignee=request.user)
 
     mailer.send_mail(

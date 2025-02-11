@@ -49,3 +49,20 @@ class ProfileAPIViewSet(viewsets.ModelViewSet):
       return Response({"message": "Password updated successfully"}, status=200)
     except Exception as e:
       return Response({"message": "Internal Server Error"}, status=500)
+
+  @action(detail=False, methods=['delete'])
+  def delete_account(self, request):
+    try:
+      ProfileService.delete_account(request.user)
+      return Response({"message": "Account deleted successfully"}, status=200)
+    except Exception as e:
+      return Response({"message": "Internal Server Error"}, status=500)
+    
+  @action(detail=False, methods=['post'])
+  def verify_account(self, request):
+    try:
+      if ProfileService.verify_account(request.data['user_id'], request.data['otp']):
+        return Response({"message": "Account verified successfully"}, status=200)
+      return Response({"message": "Invalid OTP"}, status=400)
+    except Exception as e:
+      return Response({"message": "Internal Server Error"}, status=500)

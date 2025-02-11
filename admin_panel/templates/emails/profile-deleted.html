@@ -1,0 +1,14 @@
+{% extends 'emails/base-email.html' %}
+
+{% block content %}
+<div style="background-color:#ffffff;padding:35px 75px">
+        <div style="margin-top:0"><p
+                        style="width:100%;margin:0;box-sizing:border-box">Hi {{ user.first_name }} {{ user.last_name }},</p></div>
+        <div style="margin-top:25px"><p
+                        style="width:100%;margin:0;box-sizing:border-box">We regret to inform you that your profile has been deleted as of {{ date_time }}.</p></div>
+        <div style="margin-top:25px"><p
+                        style="width:100%;margin:0;box-sizing:border-box;color:#c8c8c8;font-style:italic">
+                ** This is an auto-generated email. Please do not reply to this
+                email.**</p></div>
+</div>
+{% endblock content %}

@@ -1,4 +1,6 @@
 import uuid
+import secrets
+import base64
 from datetime import timedelta, datetime, timezone
 
 from django.db import models
@@ -40,6 +42,7 @@ class User(BaseModel, AbstractUser):
   email = models.EmailField(("email address"), unique=True)
 
   created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
+  is_verified = models.BooleanField(('verified'), default=False)
 
   enrolled_collections = models.ManyToManyField('CourseCollection', related_name='enrolled_users', blank=True)
   default_collection = models.ForeignKey('CourseCollection', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_user')
@@ -85,6 +88,16 @@ class User(BaseModel, AbstractUser):
       course for collection in collections for course in collection.collection.courses.all()
     ]
     return courses_list
+  
+# class UserTOTP(models.Model):
+#   user = models.OneToOneField(User, on_delete=models.CASCADE)
+#   totp_secret = models.CharField(max_length=32)
+#   is_verified = models.BooleanField(default=False)
+#   created_at = models.DateTimeField(auto_now_add=True)
+
+#   @classmethod
+#   def generate_secret(cls):
+#     return base64.b32encode(secrets.token_bytes(20)).decode('utf-8')
 
 class Course(BaseModel):
   image = models.ImageField(upload_to=rename_file, null=True, blank=True)
