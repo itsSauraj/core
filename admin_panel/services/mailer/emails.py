@@ -13,7 +13,7 @@ from admin_panel.services.mailer.factory import mailer
 def send_user_verification_email(user_id):
     user = User.objects.get(pk=user_id)
 
-    mail_subject = 'Welcome to Scoop Investment, please verify your email address.'
+    mail_subject = 'Welcome to Abra, please verify your email address.'
     html_message = render_to_string('emails/signup-verification.html', {
         'user': user,
         'otp': str(generate_otp_by_key(user_id)),

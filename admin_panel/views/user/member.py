@@ -28,21 +28,6 @@ class MemberAPIView(APIView):
       return [IsAuthenticated()]
 
   def post(self, request):
-    """ 
-    Create a new mentor 
-    data = {
-      "employee_id": "123456",
-      "first_name": "John",
-      "last_name": "Doe",
-      "email": "",
-      "password": "password",
-      "confirm_password": "password"
-      "role": "Mentor",
-      "joining_date": "2021-01-01",
-      "phone_number": "1234567890",
-    }
-    """
-
     serializer = CreateUserRequestSerializer(data=request.data)
 
     if not serializer.is_valid():
@@ -56,13 +41,6 @@ class MemberAPIView(APIView):
     return Response(user_serializer.data, status=201)
 
   def get(self, request, member_id):
-    """ 
-    Fetch a mentor 
-
-    Example:
-    GET /api/auth/user/member/uuid
-    """
-
     try:
       member = UserAPIService.get_user_by_id(member_id)
     except User.DoesNotExist:
@@ -73,12 +51,6 @@ class MemberAPIView(APIView):
     return Response(context, status=200)
 
   def patch(self, request, member_id=None):
-    """ 
-    Update a mentor 
-
-    Example:
-    PATCH /api/auth/user/member/uuid
-    """
     if not member_id:
       return Response("User ID is required", status=400)
     
@@ -102,16 +74,6 @@ class MemberAPIView(APIView):
     return Response(ResponseUserSerializer(member).data, status=200)
 
   def delete(self, request, member_id=None):
-    """ 
-    Delete a mentor 
-
-    Example:
-    DELETE /api/member/uuid
-    or
-    Example:
-    body = UUID[]
-    eg: ["uuid1", "uuid2"]
-    """
     if not member_id and not request.data:
       return Response("User ID is required", status=400)
 
@@ -133,12 +95,6 @@ class MemberModules():
   @api_view(['GET'])
   @permission_required('custom_permission.mentors.view', raise_exception=True)
   def get_all_mentors(request):
-    """ 
-    Fetch all mentors 
-
-    Example:
-    GET /api/user/mentor/
-    """
     members = UserAPIService.get_user_mentors(request.user.id)
     context = ResponseUserSerializer(members, many=True).data
     return Response(context, status=200)
@@ -147,14 +103,8 @@ class MemberModules():
   @api_view(['GET'])
   @permission_required('custom_permission.trainees.view', raise_exception=True)
   def get_all_trainees(request):
-    """ 
-    Fetch all mentors 
 
-    Example:
-    GET /api/auth/user/trainee/
-    """
     if request.user.groups.filter(name='Mentor').exists():
-      #TODO: Add permission to fetch all trainees that are assigned to the mentor
       members = UserAPIService.get_all_trainees()
     else:
       members = UserAPIService.get_user_trainees(request.user.id)
@@ -165,13 +115,6 @@ class MemberModules():
   @api_view(['GET'])
   @permission_required('custom_permission.trainees.view', raise_exception=True)
   def generate_report(request, trainee_id):
-    """ 
-    Generate report for a mentor 
-
-    Example:
-    GET /api/auth/user/member/<uuid:trainee_id>/report
-    """
-
     if request.user.groups.filter(name='Trainee').exists():
       trainee = request.user
     else:

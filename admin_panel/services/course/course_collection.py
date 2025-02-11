@@ -1,21 +1,19 @@
-from datetime import timedelta
-
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import status
 from rest_framework.response import Response
 
 from admin_panel.models import CourseCollection, Course
-from admin_panel.services.user.service import UserAPIService
-
 
 class CourseCollectionAPIService:
   
   @staticmethod
-  def create(request, data):
+  def create(request, data, user=None):
     courses = data.pop('courses')
 
     course_collection = CourseCollection.objects.create(**data)
-    course_collection.created_by = request.user
+    if user:
+      course_collection.created_by = user
+    else:
+      course_collection.created_by = request.user
 
     for course in courses:
       try:
@@ -80,13 +78,17 @@ class CourseCollectionAPIService:
       
   
   @staticmethod
-  def set_default_collection(request, collection):   
+  def set_default_collection(request, collection, user=None):
     try:
       if collection.is_default:
         return Response({"message": "Collection is already default"}, status=200)
       else:
-        request.user.default_collection = collection
-        request.user.save()
+        if user:
+          user.default_collection = collection
+          user.save()
+        else:
+          request.user.default_collection = collection
+          request.user.save()
         return Response({"message": "Collection set as default"}, status=200)
     except ObjectDoesNotExist:
       return Response({"message": "Collection not found"}, status=404)

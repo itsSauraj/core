@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 
 from admin_panel.models import User
 from admin_panel.services.user.serializer import UserSerializer
@@ -26,12 +26,14 @@ class ProfileService:
     )
 
   @staticmethod
-  def delete_account(user):    
+  def delete_account(user):  
+    user_id = user.id
     mailer.send_mail(
-      'send_user_account_deleted_notification', 
-      user_id=user.id
+      'send_user_account_deleted_notification',
+      user_id=user_id
     )
     user.delete()
+
 
   @staticmethod
   def verify_account(user_id, otp):
@@ -42,5 +44,5 @@ class ProfileService:
       user.is_verified = True
       user.save()
 
-      return True
+      return user
     return False

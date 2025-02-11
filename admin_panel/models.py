@@ -1,22 +1,17 @@
 import uuid
-import secrets
-import base64
-from datetime import timedelta, datetime, timezone
+from datetime import timedelta
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import AbstractUser
 
 from django.db.models.signals import pre_delete, post_delete
 
 from admin_panel.manager import CustomUserManager
 
 from django_softdelete.models import SoftDeleteModel
-from django.contrib.contenttypes.fields import GenericRelation
-from django.db import transaction
 
 from .utils import rename_file
 
-# Create your models here.
 class TimeStampedModel(models.Model):
   created_at = models.DateTimeField(('created at'), auto_now_add=True, null=False, blank=False)
   updated_at = models.DateTimeField(('updated at'), auto_now=True)
@@ -36,7 +31,8 @@ class User(BaseModel, AbstractUser):
   phone_number = models.CharField(('phone number'),max_length=15, null=True, blank=True)
   birth_date = models.DateField(('birth date'), null=True, blank=True)
   address = models.TextField(('address'), null=True, blank=True)
-  employee_id = models.CharField(('employee id'), max_length=255, null=True, blank=True, unique=True)
+  employee_id = models.CharField(('employee id'), max_length=255, null=True, blank=True)
+
   joining_date = models.DateField(('joining date'), null=True, blank=True)
 
   email = models.EmailField(("email address"), unique=True)
@@ -44,13 +40,18 @@ class User(BaseModel, AbstractUser):
   created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
   is_verified = models.BooleanField(('verified'), default=False)
 
-  enrolled_collections = models.ManyToManyField('CourseCollection', related_name='enrolled_users', blank=True)
+  enrolled_collections = models.ManyToManyField('CourseCollection', related_name='enrolled_users', blank=True, null=True)
   default_collection = models.ForeignKey('CourseCollection', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_user')
 
   objects = CustomUserManager()
 
   def __str__(self):
     return self.username
+  
+  class Meta:
+    constraints = [
+      models.UniqueConstraint(fields=['employee_id', 'created_by'], name='unique_employee_per_creator')
+    ]
   
   def save(self, *args, **kwargs):
     if not self.pk:  # Check if the user is being created
@@ -89,16 +90,6 @@ class User(BaseModel, AbstractUser):
     ]
     return courses_list
   
-# class UserTOTP(models.Model):
-#   user = models.OneToOneField(User, on_delete=models.CASCADE)
-#   totp_secret = models.CharField(max_length=32)
-#   is_verified = models.BooleanField(default=False)
-#   created_at = models.DateTimeField(auto_now_add=True)
-
-#   @classmethod
-#   def generate_secret(cls):
-#     return base64.b32encode(secrets.token_bytes(20)).decode('utf-8')
-
 class Course(BaseModel):
   image = models.ImageField(upload_to=rename_file, null=True, blank=True)
   title = models.CharField(('course title'), max_length=255, null=False, blank=False)

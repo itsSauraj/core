@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 from admin_panel.services.trainee.service import TraineeCourseServices
@@ -16,3 +16,14 @@ def user_created(sender, instance, created, **kwargs):
           "collection": [assineee.default_collection.id],
         }
         TraineeCourseServices.create(assineee, context_data)
+
+@receiver(pre_delete, sender=User)
+def user_deleted(sender, instance, **kwargs):  
+  instance.groups.clear()
+  
+  instance.username = f"deleted_{instance.username}_{instance.id}"
+  instance.email = f"deleted_{instance.email}_{instance.id}"
+  instance.employee_id = f"deleted_{instance.employee_id}_{instance.id}"
+
+  instance.save()
+

@@ -3,6 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
+
+from rest_framework_simplejwt.tokens import SlidingToken
 
 from admin_panel.services.user.serializer import ResponseUserSerializer
 from admin_panel.services.user.profile_serializer import UpdateUserRequestSerializer, UpdatePasswordRequestSerializer
@@ -13,7 +16,9 @@ from rest_framework.permissions import IsAuthenticated
 
 class ProfileAPIViewSet(viewsets.ModelViewSet):
   def get_permissions(self):
-    return [IsAuthenticated()]
+    if self.action == 'verify_account':
+        return [AllowAny()]
+    return super().get_permissions()
 
   @action(detail=False, methods=['patch'], parser_classes=[FormParser, MultiPartParser])
   def update_profile(self, request):
@@ -61,8 +66,14 @@ class ProfileAPIViewSet(viewsets.ModelViewSet):
   @action(detail=False, methods=['post'])
   def verify_account(self, request):
     try:
-      if ProfileService.verify_account(request.data['user_id'], request.data['otp']):
-        return Response({"message": "Account verified successfully"}, status=200)
+      verified_user = ProfileService.verify_account(request.data['user_id'], request.data['otp'])
+      user_serializer = ResponseUserSerializer(verified_user)
+      if verified_user:
+        context = {
+          "token": str(SlidingToken.for_user(user_serializer.instance)),
+          "user": user_serializer.data,
+        }
+        return Response(context, status=200)
       return Response({"message": "Invalid OTP"}, status=400)
     except Exception as e:
       return Response({"message": "Internal Server Error"}, status=500)

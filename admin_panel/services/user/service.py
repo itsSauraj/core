@@ -5,6 +5,10 @@ from admin_panel.models import User
 from admin_panel.services.user.serializer import UserSerializer
 from admin_panel.services.mailer.factory import mailer
 
+from admin_panel.services.course.default import default_course, default_collection
+from admin_panel.services.course.service import CourseAPIService
+from admin_panel.services.course.course_collection import CourseCollectionAPIService
+
 class UserAPIService:
 
   @staticmethod
@@ -78,16 +82,22 @@ class UserAPIService:
       return False
     post_save.send(sender=User, instance=user, created=True, groups=group, assignee=request.user)
 
-    mailer.send_mail(
-      'send_user_verification_email',
-      user_id=user.id
-    )
+    if 'Admin' in group:
+      mailer.send_mail(
+        'send_user_verification_email',
+        user_id=user.id
+      )
     
     UserAPIService.add_user_to_group(user, group)
 
     if 'Admin' not in group:
       user.created_by = request.user
       user.save()
+
+    course = CourseAPIService.import_course(request, default_course, user=user)
+    default_collection['courses'] = [course.id]
+    collection = CourseCollectionAPIService.create(request, default_collection, user=user)
+    CourseCollectionAPIService.set_default_collection(request, collection, user=user)
       
     return user
   

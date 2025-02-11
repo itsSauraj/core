@@ -26,6 +26,7 @@ class CustomTokenObtainSlidingView(TokenObtainSlidingView):
       return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     user = User.objects.get(username=request.data['username'])
+
     token = SlidingToken.for_user(user)
     
     return Response({

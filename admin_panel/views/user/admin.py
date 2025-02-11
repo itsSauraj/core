@@ -10,7 +10,6 @@ from admin_panel.models import User
 
 from admin_panel.services.user.serializer import CreateUserRequestSerializer, ResponseUserSerializer
 from admin_panel.services.user.service import UserAPIService
-from admin_panel.services.mailer.factory import mailer
 
 
 class UserAPIView(APIView):
@@ -21,16 +20,6 @@ class UserAPIView(APIView):
         return [IsAuthenticated(), IsInGroup('Admin')]
 
   def post(self, request):
-    """ 
-    Create a new user 
-    data = {
-      "first_name": "John",
-      "last_name": "Doe",
-      "email": "example@mail.com",
-      "password": "password",
-      "confirm_password": "password"
-    }
-    """
     serializer = CreateUserRequestSerializer(data=request.data)
 
     if not serializer.is_valid():
@@ -40,17 +29,10 @@ class UserAPIView(APIView):
     if created_user is False:
       return Response({"message": "User creation failed"}, status=400)
     user_serializer = ResponseUserSerializer(created_user)
-    # token = SlidingToken.for_user(user_serializer.instance)
 
-    # context = {
-    #   "token": str(token),
-    #   "user": user_serializer.data,
-    # }
-    
     return Response(user_serializer.data, status=201)
 
   def delete(self, request, id):
-    """ Delete a user """
     if request.user.id != id:
       return Response("Cannot delete another user", status=403)
     

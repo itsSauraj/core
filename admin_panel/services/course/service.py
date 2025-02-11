@@ -97,33 +97,38 @@ class CourseAPIService:
   
 
   @staticmethod
-  def import_course(request, data):
-    course = CourseAPIService.create(request, data['course'])
-    CourseAPIService.import_module(request, course, data['modules'])
+  def import_course(request, data, user=None):
+    course = CourseAPIService.create(request, data['course'], user)
+    CourseAPIService.import_module(request, course, data['modules'], user=user)
     return course
   
   @staticmethod
-  def import_module(request, course, modules, parent_module=None):
+  def import_module(request, course, modules, parent_module=None, user=None):
     for module in modules:
-      created_module = CourseAPIService.create_module(request, course.id, parent_module, CreateModuleRequestSerializer(module).data)
+      created_module = CourseAPIService.create_module(course.id, parent_module,
+                                                      CreateModuleRequestSerializer(module).data)
 
       for lesson in module.get('lessons', []):
         lesson['module'] = created_module
         lesson['duration'] = timedelta(hours=int(lesson['hours']), 
                                       minutes=int(lesson['minutes']), 
                                       seconds=int(lesson['seconds']))
-        CourseAPIService.create_lesson(request, course.id, created_module.id, CreateLessonRequestSerializer(lesson).data)
+        CourseAPIService.create_lesson(request, course.id, created_module.id,
+                                       CreateLessonRequestSerializer(lesson).data, user=user)
 
       if 'sub_modules' in module:
-        CourseAPIService.import_module(request, course, module['sub_modules'], created_module)
+        CourseAPIService.import_module(request, course, module['sub_modules'], created_module, user=user)
 
     return True
 
 
   @staticmethod
-  def create(request, data):
+  def create(request, data, user=None):
     course = Course.objects.create(**data)
-    course.created_by = request.user
+    if user:
+      course.created_by = user
+    else:
+      course.created_by = request.user
     course.save()
     return course
   
@@ -144,7 +149,7 @@ class CourseAPIService:
     return course
 
   @staticmethod
-  def create_module(request, course_id, parent_module, data):
+  def create_module(course_id, parent_module, data):
     if parent_module:
       module = CourseModules(**data, course_id=course_id, parent_module_id=parent_module.id)
     else:
@@ -159,8 +164,11 @@ class CourseAPIService:
   
 
   @staticmethod
-  def create_lesson(request, course_id, module_id, data):
-    course = CourseAPIService.get_course_by_id(course_id, request.user)
+  def create_lesson(request, course_id, module_id, data, user=None):
+    if user:
+      course = CourseAPIService.get_course_by_id(course_id, user)
+    else:
+      course = CourseAPIService.get_course_by_id(course_id, request.user)
     module = CourseAPIService.get_module_by_id(module_id)
 
     if course is None or module is None:
