@@ -197,6 +197,8 @@ AUTHENTICATION_BACKENDS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+## JWT settings
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -216,7 +218,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=7),
 }
 
-
+## Email settings
 ASYNC_EMAILS = os.getenv('ASYNC_EMAILS', 'False').lower() == 'true'
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
@@ -228,3 +230,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+
+
+## Token Settings
+PASSWORD_RESET_TOKEN_MAX_AGE = os.getenv('PASSWORD_RESET_TOKEN_MAX_AGE', 10)

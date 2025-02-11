@@ -40,7 +40,7 @@ class User(BaseModel, AbstractUser):
   created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='creator')
   is_verified = models.BooleanField(('verified'), default=False)
 
-  enrolled_collections = models.ManyToManyField('CourseCollection', related_name='enrolled_users', blank=True, null=True)
+  enrolled_collections = models.ManyToManyField('CourseCollection', related_name='enrolled_users', blank=True)
   default_collection = models.ForeignKey('CourseCollection', on_delete=models.SET_NULL, null=True, blank=True, related_name='default_user')
 
   objects = CustomUserManager()
@@ -122,7 +122,7 @@ class CourseModules(BaseModel):
   title = models.CharField(('module title'), max_length=255, null=False, blank=False, unique=False)
   description = models.TextField(('module description'), null=True, blank=True)
   course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True, related_name='modules')
-  parent_module = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='sub_modules', verbose_name='parent module')
+  parent_module = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='sub_modules', verbose_name='parent module')
   sequence = models.IntegerField(('module sequence'), default=0)
 
   def __str__(self):
