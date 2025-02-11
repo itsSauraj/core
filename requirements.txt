@@ -10,7 +10,7 @@ charset-normalizer==3.4.1
 constantly==23.10.4
 cryptography==44.0.0
 daphne==4.1.2
-Django==5.1.4
+Django==5.1.5
 django-cors-headers==4.6.0
 django-otp==1.5.4
 django-soft-delete==1.0.16
