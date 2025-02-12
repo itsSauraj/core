@@ -74,7 +74,7 @@ class ProfileService:
     return tokenization.generate_token(user)
   
   @staticmethod
-  def reset_password(user_id, token, new_password):
+  def reset_password(token, new_password):
 
     is_valid, user, error = tokenization.validate_token(token)
     if not is_valid:

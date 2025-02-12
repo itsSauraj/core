@@ -34,13 +34,22 @@ class CourseDataSerializer(serializers.Serializer):
 # Respsonse serializers
 class ResponseCourseSerializer(ModelSerializer):
   duration = serializers.SerializerMethodField()
+  collections = serializers.SerializerMethodField()
   
   class Meta:
     model = Course
-    fields = ['id', 'title', 'description', 'duration', 'image']
+    fields = ['id', 'title', 'description', 'duration', 'image', 'collections']
 
   def get_duration(self, obj):
     return get_course_duration(obj)
+  
+  def get_collections(self, obj):
+    return [
+      {
+        'id': collection.id,
+        'title': collection.title,
+      } for collection in obj.collections.all()
+    ]
 
 class ResponseModuleSerializer(ModelSerializer):
   duration = serializers.DurationField(required=False)

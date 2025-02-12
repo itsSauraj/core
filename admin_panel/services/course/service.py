@@ -201,6 +201,7 @@ class CourseAPIService:
       "description": metadata['description'],
       "duration": metadata['duration'],
       "image": metadata['image'],
+      "collections": metadata['collections'],
       "modules": module_structure,
     }
 
