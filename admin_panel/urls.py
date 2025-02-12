@@ -5,6 +5,7 @@ from admin_panel.views.user.profile import ProfileAPIViewSet
 from admin_panel.views.course.controller import CourseAPIView, ModuleAPIView, LessonAPIView
 from admin_panel.views.course.course_collection import CourseCollectionAPIView, CourseCollectionModules
 from admin_panel.views.trainee.controller import TraineeCourseAPIView, TraineeAPIView
+from admin_panel.views.examination.controller import ExaminationAPIView
 
 from rest_framework.routers import DefaultRouter
 from admin_panel.views.notifications import NotificationViewSet
@@ -61,5 +62,9 @@ urlpatterns = [
   path('trainee/collection/mini/<uuid:trainee_id>', TraineeAPIView.get_minified_user_collections, name='trainee_assigned_collections_mini'),
   path('member/<uuid:collection_id>/<uuid:course_id>', TraineeAPIView.user_course_actions, name='trainee_course_action'),
   path('member/action/lesson', TraineeAPIView.user_course_lessson_actions, name='trainee_course_lesson_action'),
+
+  # Examination Management APIs
+  path('exam/', ExaminationAPIView.as_view(), name='exam_apis'),
+  path('exam/<uuid:exam_id>/', ExaminationAPIView.as_view(), name='exam_api_with_id'),
 ]
 

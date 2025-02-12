@@ -4,6 +4,24 @@ from rest_framework.response import Response
 from admin_panel.models import CourseCollection, Course
 
 class CourseCollectionAPIService:
+
+  @staticmethod
+  def get_collection_by_id(collection_id, user=None):
+    try:
+      if user:
+        collection = CourseCollection.objects.get(id=collection_id, created_by=user)
+      else:
+        collection = CourseCollection.objects.get(id=collection_id)
+      return collection
+    except ObjectDoesNotExist:
+      return None
+    
+  @staticmethod
+  def get_all_collections(user=None):
+    if user:
+      return CourseCollection.objects.all().filter(created_by=user)
+    return CourseCollection.objects.all()
+  
   
   @staticmethod
   def create(request, data, user=None):

@@ -272,3 +272,18 @@ class Notification(BaseModel):
 
     def __str__(self):
         return f"{self.recipient.username} - {self.message[:50]}"
+    
+class ScheduledExam(BaseModel):
+  created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_scheduled_exams')
+  assigned_mentor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_exams')
+  assigned_trainee = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='trainee_scheduled_exams')
+
+  exam_details = models.TextField(('exam details'), null=False, blank=False)
+  duration = models.IntegerField(('duration in minutes'), null=False, blank=False)
+  exam_time = models.TimeField(('exam time'), null=False, blank=False)
+  exam_date = models.DateTimeField(('exam date'), null=False, blank=False)
+  collection = models.ForeignKey(CourseCollection, on_delete=models.SET_NULL, null=True, blank=True, related_name='exams')
+
+  def __str__(self):
+    return f"{self.assigned_trainee.username} - {self.exam_date} - {self.exam_time}"
+  
