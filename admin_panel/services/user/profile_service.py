@@ -69,8 +69,8 @@ class ProfileService:
     return verify_otp_by_key(user_id, otp)
   
   @staticmethod
-  def generate_password_reset_token(email):
-    user = User.objects.get(email=email)
+  def generate_password_reset_token(user_id):
+    user = User.objects.get(pk=user_id)
     return tokenization.generate_token(user)
   
   @staticmethod

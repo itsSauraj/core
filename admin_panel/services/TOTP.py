@@ -1,9 +1,7 @@
 import time
-import hashlib
 
-from django_otp.oath import TOTP
 from django.conf import settings
-
+from django_otp.oath import TOTP
 
 class TOTPVerification:
 
@@ -12,7 +10,7 @@ class TOTPVerification:
     self.last_verified_counter = -1
     self.verified = False
     self.number_of_digits = 6
-    self.token_validity_period = 35000
+    self.token_validity_period = 300
 
   def totp_obj(self):
     totp = TOTP(key=self.key,
@@ -41,15 +39,11 @@ class TOTPVerification:
           self.verified = False
     return self.verified
 
-def generate_key(key):
-  return hashlib.sha256(f"{key}{settings.SECRET_KEY}".encode()).hexdigest()
 
 def generate_otp_by_key(key):
-  key = generate_key(key) + str(int(time.time()) // 30)
-  key = str(key)
+  key = f"{key}_{settings.SECRET_KEY}"
   return TOTPVerification(key=key.encode('utf-8')).generate_token()
 
 def verify_otp_by_key(key, otp):
-  key = generate_key(key) + str(int(time.time()) // 30)
-  key = str(key)
+  key = f"{key}_{settings.SECRET_KEY}"
   return TOTPVerification(key=key.encode('utf-8')).verify_token(otp)

@@ -130,16 +130,14 @@ class ProfileAPIViewSet(viewsets.ModelViewSet):
     try:
       serializer.is_valid(raise_exception=True)
       
-      if not ProfileService.verify_otp(
-        user_id=serializer.validated_data['user_id'],
-        otp=serializer.validated_data['otp']
+      if not ProfileService.verify_otp(user_id=str(serializer.validated_data['user_id']), otp=str(serializer.validated_data['otp'])
       ): 
         raise Exception("Invalid or expired OTP")
       
       return Response({
         "message": "OTP verified successfully",
-        "token": ProfileService.generate_password_reset_token(
-          serializer.validated_data['user_id']
+        "token": str(ProfileService.generate_password_reset_token(
+          serializer.validated_data['user_id'])
         )
       }, status=status.HTTP_200_OK)
         

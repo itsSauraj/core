@@ -1,5 +1,5 @@
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timezone
 import hashlib
 import base64
 from cryptography.fernet import Fernet, InvalidToken
@@ -16,7 +16,7 @@ class PasswordResetTokenHandler:
         hashlib.sha256(settings.SECRET_KEY.encode()).digest()
       )
       f = Fernet(key)
-      timestamp = int(datetime.now(datetime.timezone.utc).timestamp())
+      timestamp = int(datetime.now(timezone.utc).timestamp())
       message = f"{user.id}:{user.email}:{user.password}:{timestamp}"
       return f.encrypt(message.encode()).decode()
     except Exception as e:
@@ -32,7 +32,7 @@ class PasswordResetTokenHandler:
       f = Fernet(key)
       decrypted = f.decrypt(token.encode()).decode()
       user_id, email, password_hash, timestamp = decrypted.split(':')
-      age = datetime.now(datetime.timezone.utc).timestamp() - int(timestamp)
+      age = datetime.now(timezone.utc).timestamp() - int(timestamp)
       if age > (max_age_minutes * 60):
         return False, None, "Token has expired"
       try:
