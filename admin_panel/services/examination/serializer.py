@@ -23,3 +23,52 @@ class ExamScheduleSerializer(serializers.ModelSerializer):
       if datetime.datetime.today().time() > data['exam_time']:
         raise serializers.ValidationError("Exam time should be greater than current time")
     return data
+  
+class ResponseExamScheduleSerializer(serializers.ModelSerializer):
+  assigned_mentor = serializers.SerializerMethodField()
+  assigned_trainee = serializers.SerializerMethodField()
+  collection = serializers.SerializerMethodField()
+  created_by = serializers.SerializerMethodField()
+
+  class Meta:
+    model = ScheduledExam
+    fields = ['id', 'collection', 'exam_date', 'exam_time', 'assigned_mentor', 
+              'assigned_trainee', 'created_by', 'exam_details', 'duration']
+    
+  def get_assigned_mentor(self, obj):
+    return {
+      'id': obj.assigned_mentor.id,
+      'first_name': obj.assigned_mentor.first_name,
+      'last_name': obj.assigned_mentor.last_name,
+      'email': obj.assigned_mentor.email,
+    }
+  
+  def get_assigned_trainee(self, obj):
+    return {
+      'id': obj.assigned_trainee.id,
+      'first_name': obj.assigned_trainee.first_name,
+      'last_name': obj.assigned_trainee.last_name,
+      'email': obj.assigned_trainee.email,
+    }
+  
+  def get_collection(self, obj):
+    courses = [
+        {
+          'id': course.id,
+          'title': course.title,
+        }
+      for course in obj.collection.courses.all()
+    ]
+    return {
+      'id': obj.collection.id,
+      'title': obj.collection.title,
+      'courses': courses,
+    }
+  
+  def get_created_by(self, obj):
+    return {
+      'id': obj.created_by.id,
+      'first_name': obj.created_by.first_name,
+      'last_name': obj.created_by.last_name,
+      'email': obj.created_by.email,
+    }

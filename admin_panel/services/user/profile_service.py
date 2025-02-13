@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from django.db.models.signals import post_save, pre_delete
 from django.core.exceptions import ValidationError
 
@@ -14,6 +16,8 @@ class ProfileService:
     for key, value in data.items():
       setattr(user, key, value)
     user.save()
+
+    user.updated_at = datetime.now(tz=timezone.utc)
 
     return user
   

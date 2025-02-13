@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 
@@ -109,6 +111,8 @@ class UserAPIService:
     for key, value in data.items():
       setattr(user, key, value)
     user.save()
+
+    user.updated_at = datetime.now(tz=timezone.utc)
 
     return user
 

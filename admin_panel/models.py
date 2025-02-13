@@ -62,6 +62,10 @@ class User(BaseModel, AbstractUser):
       self.enrolled_collections.add(get_default_collection)
     super(User, self).save(*args, **kwargs)
 
+  # Get full name of the user
+  def get_full_name(self):
+    return f"{self.first_name} {self.last_name}"
+
   # Get all permissions of the user
   def get_permissions(self):
     return self.get_all_permissions()

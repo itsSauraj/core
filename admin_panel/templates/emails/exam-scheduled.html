@@ -1,38 +1,41 @@
 {% extends 'emails/base-email.html' %}
 
 {% block content %}
-<div style="background-color:#ffffff;padding:35px 75px;text-align:left;">
-
+<div style="padding:35px 75px;text-align:left;"></div>
   Hi <strong>{{ user.first_name }} {{ user.last_name }}</strong>,<br><br>
-  We are pleased to inform you that your exam has been scheduled. See details below:<br><br>
+  {% if rescheduled %}
+    We are pleased to inform you that your exam of course {{ exam.name }} has 
+    been rescheduled. See details below:<br><br>
+  {% else %}
+    We are pleased to inform you that your exam has been scheduled. See details below:<br><br>
+  {% endif %}
 
   <table style="width:100%;border-collapse:collapse;border:1px solid blue;">
     <tr>
-      <td style="padding:10px 0;background-color:blue;color:white;border:1px solid white;">Exam:</td>
-      <td style="padding:10px 0;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.name }}</td>
+      <td style="padding:10px;border:1px solid blue;">Exam:</td>
+      <td style="padding:10px;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.name }}</td>
     </tr>
     <tr>
-      <td style="padding:10px 0;background-color:blue;color:white;border:1px solid white;">Mentor:</td>
-      <td style="padding:10px 0;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.mentor }}</td>
+      <td style="padding:10px;border:1px solid blue;">Mentor:</td>
+      <td style="padding:10px;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.mentor }}</td>
     </tr>
     <tr>
-      <td style="padding:10px 0;background-color:blue;color:white;border:1px solid white;">Date and Time:</td>
-      <td style="padding:10px 0;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.date_time }}</td>
+      <td style="padding:10px;border:1px solid blue;">Date and Time:</td>
+      <td style="padding:10px;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.date_time }}</td>
     </tr>
     <tr>
-      <td style="padding:10px 0;background-color:blue;color:white;border:1px solid white;">Scheduled by:</td>
-      <td style="padding:10px 0;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.scheduled_by }}</td>
+      <td style="padding:10px;border:1px solid blue;">Scheduled by:</td>
+      <td style="padding:10px;color:hsl(221.2, 83.2%, 53.3%);border:1px solid blue;">{{ exam.scheduled_by }}</td>
     </tr>
   </table>
-  <tr>
-    <span style="padding:10px 0;color:hsl(9, 83%, 53%)">Please see the exam details on your profile.</span>
-  </tr>
+  <div style="padding:10px 0;">
+    <span style="color:hsl(9, 83%, 53%)">Please see the exam details on your profile.</span>
+  </div>
   <br>
-  <tr>
-    <span style="padding:10px 0;color:#c8c8c8;font-style:italic;">
+  <div style="padding:10px 0;">
+    <span style="color:#c8c8c8;font-style:italic;">
       ** This is an auto-generated email. Please do not reply to this email.**
     </span>
+  </div>
 </div>
-</tr>
-
 {% endblock content %}

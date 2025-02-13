@@ -12,7 +12,11 @@ class NotificationSerializer(serializers.ModelSerializer):
     read_only_fields = ['created_at']
 
   def get_sender(self, obj):
-    return str(obj.sender.id) if obj.sender else None
+    return {
+      "id": str(obj.sender.id),
+      "name": obj.sender.get_full_name(),
+      "avatar": obj.sender.avatar.url if obj.sender.avatar else None
+    } if obj.sender else None
 
   def get_recipient(self, obj):
     return str(obj.recipient.id) if obj.recipient else None

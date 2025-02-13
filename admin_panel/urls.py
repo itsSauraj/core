@@ -66,5 +66,6 @@ urlpatterns = [
   # Examination Management APIs
   path('exam/', ExaminationAPIView.as_view(), name='exam_apis'),
   path('exam/<uuid:exam_id>/', ExaminationAPIView.as_view(), name='exam_api_with_id'),
+  path('exam/<uuid:exam_id>/<str:notify>/', ExaminationAPIView.as_view(), name='exam_api_with_id_notify'),  
 ]
 

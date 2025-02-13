@@ -34,7 +34,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'strong-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv("DEBUG", 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '*').split(',')
@@ -221,6 +221,7 @@ SIMPLE_JWT = {
 ## Email settings
 ASYNC_EMAILS = os.getenv('ASYNC_EMAILS', 'False').lower() == 'true'
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+print(EMAIL_BACKEND)
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
@@ -234,3 +235,8 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 
 ## Token Settings
 PASSWORD_RESET_TOKEN_MAX_AGE = os.getenv('PASSWORD_RESET_TOKEN_MAX_AGE', 10)
+
+## SITE_URL
+SITE_URL = os.getenv('SITE_URL')
+SITE_LOGIN_URL = os.getenv('SITE_LOGIN_URL')
+SEND_MAIL = os.getenv('SEND_MAIL', 'False').lower() == 'true'
