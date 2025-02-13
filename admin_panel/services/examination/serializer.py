@@ -41,6 +41,7 @@ class ResponseExamScheduleSerializer(serializers.ModelSerializer):
       'first_name': obj.assigned_mentor.first_name,
       'last_name': obj.assigned_mentor.last_name,
       'email': obj.assigned_mentor.email,
+      'avatar': obj.assigned_mentor.avatar.url if obj.assigned_mentor.avatar else None,
     }
   
   def get_assigned_trainee(self, obj):
@@ -49,6 +50,7 @@ class ResponseExamScheduleSerializer(serializers.ModelSerializer):
       'first_name': obj.assigned_trainee.first_name,
       'last_name': obj.assigned_trainee.last_name,
       'email': obj.assigned_trainee.email,
+      'avatar': obj.assigned_trainee.avatar.url if obj.assigned_trainee.avatar else None,
     }
   
   def get_collection(self, obj):
