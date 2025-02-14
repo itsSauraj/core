@@ -17,6 +17,7 @@ from datetime import timedelta
 load_dotenv()
 
 # Load environment variables
+DATABASE_BACKED = os.getenv('DATABASE_BACKEND')
 DATABASE_HOST = os.getenv('DATABASE_HOST')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 DATABASE_USER = os.getenv('DATABASE_USER')
@@ -39,13 +40,12 @@ DEBUG = os.getenv("DEBUG", 'False').lower() == 'true'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '*').split(',')
 
-CORS_ALLOW_HEADERS = ['*']
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_METHODS = True
+CORS_ALLOW_HEADERS = os.getenv('CORS_ALLOW_HEADERS', '*').split(',')
+CORS_ALLOW_CREDENTIALS = os.getenv('CORS_ALLOW_CREDENTIALS', 'False').lower() == 'true'
+CORS_ALLOW_ALL_METHODS = os.getenv('CORS_ALLOW_ALL_METHODS', 'False').lower() == 'true'
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -114,12 +114,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.routing.application'
 
-if not DEBUG:
+CHANNEL_LAYERS = os.getenv('CHANNEL_LAYERS', 'inmemory').lower()
+
+if CHANNEL_LAYERS == 'redis':
+
+    REDIS_BACKEND = os.getenv('REDIS_BACKEND', 'channels_redis.core.RedisChannelLayer')
+    REDIS_HOST = os.getenv('REDIS_HOST', '127.0.0.1')
+    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+
     CHANNEL_LAYERS = {
         'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'BACKEND': REDIS_BACKEND,
             'CONFIG': {
-                "hosts": [('127.0.0.1', 6379)],
+                "hosts": [(REDIS_HOST, REDIS_PORT)],
             },
         },
     }
@@ -136,7 +143,7 @@ else:
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': DATABASE_BACKED,
         'NAME': DATABASE_NAME,
         'USER': DATABASE_USER,
         'PASSWORD': DATABASE_PASSWORD,
@@ -198,30 +205,37 @@ AUTHENTICATION_BACKENDS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ## JWT settings
+ALGORITHM = os.getenv('ALGORITHM', 'HS256')
+ACCESS_TOKEN_LIFETIME = timedelta(minutes=int(os.getenv('ACCESS_TOKEN_LIFETIME', 30)))
+AUTH_HEADER_TYPES = os.getenv('AUTH_HEADER_TYPES', 'Bearer')
+BLACKLIST_AFTER_ROTATION = os.getenv('BLACKLIST_AFTER_ROTATION', 'True').lower() == 'true'
+UPDATE_LAST_LOGIN = os.getenv('UPDATE_LAST_LOGIN', 'True').lower() == 'true'
+SLIDING_TOKEN_LIFETIME = timedelta(minutes=int(os.getenv('SLIDING_TOKEN_LIFETIME', 600)))
+SLIDING_TOKEN_REFRESH_LIFETIME = timedelta(days=int(os.getenv('SLIDING_TOKEN_REFRESH_LIFETIME', 7)))
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=ACCESS_TOKEN_LIFETIME),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "UPDATE_LAST_LOGIN": True,
+    "BLACKLIST_AFTER_ROTATION": BLACKLIST_AFTER_ROTATION,
+    "UPDATE_LAST_LOGIN": UPDATE_LAST_LOGIN,
 
-    "ALGORITHM": "HS256",
+    "ALGORITHM": ALGORITHM,
     "SIGNING_KEY": SECRET_KEY,
 
-    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_TYPES": (AUTH_HEADER_TYPES,),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.SlidingToken',),
 
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=600),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=7),
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=SLIDING_TOKEN_LIFETIME),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=SLIDING_TOKEN_REFRESH_LIFETIME),
 }
 
 ## Email settings
 ASYNC_EMAILS = os.getenv('ASYNC_EMAILS', 'False').lower() == 'true'
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
-print(EMAIL_BACKEND)
+
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
