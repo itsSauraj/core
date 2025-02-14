@@ -17,7 +17,7 @@ class ExamScheduleSerializer(serializers.ModelSerializer):
     exam_date = data['exam_date']
     current_date = datetime.datetime.now(tz=datetime.timezone.utc)
     if exam_date < current_date:
-      raise serializers.ValidationError("Exam date should be greater than today's date")
+      raise serializers.ValidationError("Exam date should be same or greater than today's date")
     
     if exam_date == current_date:
       if datetime.datetime.today().time() > data['exam_time']:
@@ -29,6 +29,7 @@ class ResponseExamScheduleSerializer(serializers.ModelSerializer):
   assigned_trainee = serializers.SerializerMethodField()
   collection = serializers.SerializerMethodField()
   created_by = serializers.SerializerMethodField()
+  exam_details = serializers.SerializerMethodField()
 
   class Meta:
     model = ScheduledExam
@@ -74,3 +75,11 @@ class ResponseExamScheduleSerializer(serializers.ModelSerializer):
       'last_name': obj.created_by.last_name,
       'email': obj.created_by.email,
     }
+  
+  def get_exam_details(self, obj):
+    if self.context.get('trainee'):
+      current_date = datetime.datetime.now(tz=datetime.timezone.utc)
+      if obj.exam_date < current_date:
+        return ""
+      return obj.exam_details
+    return obj.exam_details

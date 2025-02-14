@@ -32,10 +32,24 @@ class ExaminationAPIView(APIView):
   def get(self, request, exam_id=None):
     if exam_id:
       try:
+        if request.user.groups.filter(name='Trainee').exists():
+          exams = request.user.trainee_scheduled_exams.all().filter(id=exam_id).first()
+
+          serializer = ResponseExamScheduleSerializer(exams, context={'trainee': True})
+          return Response(serializer.data, status=200)
+
         exam = ExaminationService.get_exam_by_id(request.user, exam_id)
         return Response(ResponseExamScheduleSerializer(exam).data, status=200)
       except Exception as e:
         return Response({"message": str(e)}, status=400)
+      
+
+    if request.user.groups.filter(name='Trainee').exists():
+      exams = request.user.trainee_scheduled_exams.all()
+
+      serializer = ResponseExamScheduleSerializer(exams, many=True, context={'trainee': True})
+      return Response(serializer.data, status=200)
+                      
     exams = ExaminationService.get_all_exams(request.user)
     serializer = ResponseExamScheduleSerializer(exams, many=True)
     return Response(serializer.data, status=200)
