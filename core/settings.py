@@ -17,7 +17,7 @@ from datetime import timedelta
 load_dotenv()
 
 # Load environment variables
-DATABASE_BACKED = os.getenv('DATABASE_BACKEND')
+DATABASE_BACKEND = os.getenv('DATABASE_BACKEND')
 DATABASE_HOST = os.getenv('DATABASE_HOST')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 DATABASE_USER = os.getenv('DATABASE_USER')
@@ -37,7 +37,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'strong-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", 'False').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = ["*"]
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '*').split(',')
 
 CORS_ALLOW_HEADERS = os.getenv('CORS_ALLOW_HEADERS', '*').split(',')
@@ -117,7 +118,6 @@ ASGI_APPLICATION = 'core.routing.application'
 CHANNEL_LAYERS = os.getenv('CHANNEL_LAYERS', 'inmemory').lower()
 
 if CHANNEL_LAYERS == 'redis':
-
     REDIS_BACKEND = os.getenv('REDIS_BACKEND', 'channels_redis.core.RedisChannelLayer')
     REDIS_HOST = os.getenv('REDIS_HOST', '127.0.0.1')
     REDIS_PORT = os.getenv('REDIS_PORT', 6379)
@@ -143,7 +143,7 @@ else:
 
 DATABASES = {
     'default': {
-        'ENGINE': DATABASE_BACKED,
+        'ENGINE': DATABASE_BACKEND,
         'NAME': DATABASE_NAME,
         'USER': DATABASE_USER,
         'PASSWORD': DATABASE_PASSWORD,
@@ -206,15 +206,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ## JWT settings
 ALGORITHM = os.getenv('ALGORITHM', 'HS256')
-ACCESS_TOKEN_LIFETIME = timedelta(minutes=int(os.getenv('ACCESS_TOKEN_LIFETIME', 30)))
+ACCESS_TOKEN_LIFETIME = os.getenv('ACCESS_TOKEN_LIFETIME', 30)
 AUTH_HEADER_TYPES = os.getenv('AUTH_HEADER_TYPES', 'Bearer')
 BLACKLIST_AFTER_ROTATION = os.getenv('BLACKLIST_AFTER_ROTATION', 'True').lower() == 'true'
 UPDATE_LAST_LOGIN = os.getenv('UPDATE_LAST_LOGIN', 'True').lower() == 'true'
-SLIDING_TOKEN_LIFETIME = timedelta(minutes=int(os.getenv('SLIDING_TOKEN_LIFETIME', 600)))
-SLIDING_TOKEN_REFRESH_LIFETIME = timedelta(days=int(os.getenv('SLIDING_TOKEN_REFRESH_LIFETIME', 7)))
+SLIDING_TOKEN_LIFETIME = int(os.getenv('SLIDING_TOKEN_LIFETIME', 600))
+SLIDING_TOKEN_REFRESH_LIFETIME = int(os.getenv('SLIDING_TOKEN_REFRESH_LIFETIME', 7))
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=ACCESS_TOKEN_LIFETIME),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=int(ACCESS_TOKEN_LIFETIME)),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": BLACKLIST_AFTER_ROTATION,

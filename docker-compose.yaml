@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17
+    restart: always
+    env_file:
+      - .env.production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - abraconnect
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    command: > 
+      sh -c "
+        until nc -z db 5432; do echo 'Waiting for DB...'; sleep 1; done;
+        echo 'DB is up!';
+        python manage.py migrate &&
+        python manage.py setup_permissions &&
+        python manage.py setup_roles &&
+        daphne -b 0.0.0.0 -p 8000 core.asgi:application
+      "
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env.production
+    networks:
+      - abraconnect
+
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+    networks:
+      - abraconnect
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  abraconnect:
+    driver: bridge
