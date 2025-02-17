@@ -30,7 +30,7 @@ urlpatterns = [
   path('auth/user/', include('admin_panel.user_urls')),
 
   # Member Management APIs
-  path('member/<uuid:member_id>', MemberAPIView.as_view(), name='mentor_id_apis'),
+  path('member/<uuid:member_id>', MemberAPIView.as_view(), name='member_user_apis'),
   path('member/', MemberAPIView.as_view(), name='members_api'),
   path('user/mentor/', MemberModules.get_all_mentors, name='get_all_mentors'),
   path('user/trainee/', MemberModules.get_all_trainees, name='get_all_trainees'),
