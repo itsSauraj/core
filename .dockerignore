@@ -10,6 +10,10 @@ ENV/
 env.bak/
 venv.bak/
 
+uploads/
+static/
+staticfiles/
+
 *.log
 *.pot
 *.pyc
