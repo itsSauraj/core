@@ -1,93 +1,161 @@
-# Overview
+# Training Management Platform
 
-This project is a comprehensive platform for managing trainees, courses, and assessments while facilitating effective communication and collaboration among trainees, mentors, and administrators. It focuses on tracking course progress and conducting evaluations.
+A comprehensive platform for managing trainees, courses, and assessments while facilitating effective communication and collaboration among trainees, mentors, and administrators.
 
-[API Documentation on POSTMAN](https://documenter.getpostman.com/view/28728365/2sAYXFjdCz) is hosted here you can kindly check it out.
+[![API Documentation](https://img.shields.io/badge/API%20Docs-Postman-orange)](https://documenter.getpostman.com/view/28728365/2sAYXFjdCz)
+[![Python](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-Latest-092E20)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-Latest-red)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](https://www.docker.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff)](https://www.docker.com/)
+[![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=fff)](https://git-scm.com/downloads)
 
+## Features
 
-# Tech Stack
+- User Management (Trainees, Mentors, Administrators)
+- Course Management and Progress Tracking
+- Assessment and Evaluation System
+- Real-time Communication via WebSockets
+- Role-based Access Control
+- Soft Delete Support
+- Background Task Processing
 
-* __Backend__
-  * Python (v3.12.x)
-  * Django
-  * Django Rest Framework
-  * Django Rest Framework Simple JWT
-  * Django Softdelete
-  * Django Channels
-  * PostgreSQL
-  * Redis (Background worker)
-  * Docker and Docker compose
+## Tech Stack
 
-# How to Run
+### Backend
+- Python (v3.12.x)
+- Django & Django REST Framework
+- JWT Authentication
+- Django Channels (WebSocket Support)
+- Django Softdelete
+- PostgreSQL (Database)
+- Redis (Cache & Message Broker)
+- Docker & Docker Compose
 
-Follow the commands in order:
+## Prerequisites
 
-1. __Create a Python3 virtual environment__
+- Python 3.12 or higher
+- PostgreSQL
+- Redis (for WebSocket and background tasks)
+- Docker and Docker Compose (optional)
+
+## Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd <project-directory>
+   ```
+
+2. **Create and activate virtual environment**
    ```bash
    python3 -m venv venv
+   source venv/bin/activate  # Linux/macOS
+   # or
+   .\venv\Scripts\activate  # Windows
    ```
 
-2. __Activate the virtual environment__
-   ```bash
-   source venv/bin/activate
-   ```
-
-3. __Install dependencies and setup the project__
+3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
+   ```
+
+4. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   # Update .env with your configuration
+   ```
+
+5. **Database Setup**
+   ```bash
    python manage.py migrate
    python manage.py setup_permissions
    python manage.py setup_roles
    ```
 
-4. __Run the application__
+6. **Run Development Server**
+   
+   Standard Django Server:
    ```bash
    python manage.py runserver
    ```
 
-   __Note:__ To run with WebSocket support, you will need to install Redis for socket layering and run the application using `gunicorn` ASGI or `daphne` ASGI configuration.
+   With WebSocket Support:
    ```bash
    daphne -b 0.0.0.0 -p 8000 core.asgi:application
    ```
 
-5. __For hot reload__
+## Docker Deployment
+
+### Using Docker
+
+1. **Build the Image**
    ```bash
-   python server.py
+   docker build -t core-app .
    ```
-  # Running with Docker
 
-  To run the application using Docker, follow these steps:
+2. **Run the Container**
+   ```bash
+   docker run -d -p 8000:8000 --name core-app-container core-app
+   ```
 
-  1. __Build the Docker image__
-    ```bash
-    docker build -t core-app .
-    ```
+### Using Docker Compose
 
-  2. __Run the Docker container__
-    ```bash
-    docker run -d -p 8000:8000 --name core-app-container core-app
-    ```
+1. **Start Services**
+   ```bash
+   docker-compose up --build
+   ```
 
-  3. __Access the application__
-    Open your browser and navigate to `http://localhost:8000`.
+2. **Run Migrations**
+   ```bash
+   docker-compose exec web python manage.py migrate
+   docker-compose exec web python manage.py setup_permissions
+   docker-compose exec web python manage.py setup_roles
+   ```
 
-  __Note:__ Ensure that Docker is installed and running on your machine before executing these commands.
-  # Docker Compose Setup
+## API Documentation
 
-  To run the application with Docker Compose, follow these steps:
+Comprehensive API documentation is available on Postman:
+[API Documentation](https://documenter.getpostman.com/view/28728365/2sAYXFjdCz)
 
-  1. __Ensure you have a `docker-compose.yml` file__ with the necessary configurations for your services (db, redis, web).
+## Running Tests ![](https://img.shields.io/badge/inbeta-red) ![](https://img.shields.io/badge/inprogress-blue)
 
-  2. __Run the Docker Compose services__
-    ```bash
-    docker-compose up --build
-    ```
 
-  3. __Access the application__
-    Open your browser and navigate to `http://localhost:8000`.
 
-  __Note:__ Ensure that Docker and Docker Compose are installed and running on your machine before executing these commands.
+Writing the test case in under beta
 
-For detailed API documentation, please visit the following URLs:
+```bash
+# Run all tests
+pytest
 
-* [API Documentation on POSTMAN](https://documenter.getpostman.com/view/28728365/2sAYXFjdCz)
+# Run specific test file
+pytest tests/test_file.py
+
+# Run with coverage report
+pytest --cov=.
+```
+
+## Common Issues & Troubleshooting
+
+1. **Database Connection Issues**
+   - Verify PostgreSQL is running
+   - Check database credentials in .env
+   - Ensure database exists
+
+2. **WebSocket Connection Issues**
+   - Verify Redis is running
+   - Check Redis connection settings
+   - Ensure proper ASGI setup
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
