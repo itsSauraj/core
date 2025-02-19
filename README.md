@@ -10,6 +10,7 @@ A comprehensive platform for managing trainees, courses, and assessments while f
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue)](https://www.docker.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff)](https://www.docker.com/)
 [![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=fff)](https://git-scm.com/downloads)
+[![AWS](https://img.shields.io/badge/amazon%20s3-252F3E?logo=amazons3&logoColor=FF9900)](#)
 
 ## Features
 
