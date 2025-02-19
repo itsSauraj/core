@@ -79,6 +79,9 @@ class CourseCollectionAPIService:
         course_collection.courses.add(course)
       except ObjectDoesNotExist:
         continue
+    
+    if data.get('removed'):
+      course_collection.image = None
 
     course_collection.save()
     return course_collection

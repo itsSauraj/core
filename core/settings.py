@@ -193,7 +193,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
 
 MEDIA_URL = '/media/'
-MEIDA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+MEIDA_ROOT = os.path.join(BASE_DIR)
 
 AUTH_USER_MODEL = 'admin_panel.User'
 AUTHENTICATION_BACKENDS = [
@@ -205,7 +205,7 @@ STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
         "OPTIONS": {
-            "location": os.path.join(BASE_DIR, "mediafiles"),
+            "location": MEIDA_ROOT,
         },
     },
     "staticfiles": {

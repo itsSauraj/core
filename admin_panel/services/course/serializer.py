@@ -78,10 +78,11 @@ class UUIDSerializer(serializers.Serializer):
 
 class CreateRequestCourseGroupSerializer(ModelSerializer):
   image = serializers.ImageField(required=False)
+  removed = serializers.BooleanField(required=False)
   
   class Meta:
     model = CourseCollection
-    fields = ['title', 'description', 'image', 'alloted_time']
+    fields = ['title', 'description', 'image', 'alloted_time', 'removed']
 
 class ResponseCourseGroupSerializer(ModelSerializer):
   courses = serializers.SerializerMethodField()

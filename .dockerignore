@@ -11,8 +11,11 @@ env.bak/
 venv.bak/
 
 uploads/
+uploads/*
 static/
+static/*
 staticfiles/
+staticfiles/*
 
 *.log
 *.pot
