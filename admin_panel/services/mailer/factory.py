@@ -7,9 +7,6 @@ class Mailer:
     self.mail_classes[mail_name] = func
 
   def send_mail(self, mail_name, is_async=True, **kwargs):
-    if not settings.SEND_MAIL:
-      print("Mail sending is disabled")
-      return
     
     if not settings.ASYNC_EMAILS:
       is_async = False

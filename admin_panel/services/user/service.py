@@ -89,6 +89,13 @@ class UserAPIService:
         'send_user_verification_email',
         user_id=user.id
       )
+    else: 
+      mailer.send_mail(
+        'send_member_credentials_email',
+        created_by=request.user,
+        user_id=user.id,
+        password=data['password']
+      )
     
     UserAPIService.add_user_to_group(user, group)
 

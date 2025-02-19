@@ -14,7 +14,11 @@ sender_email = settings.SENDER_EMAIL
 site_url = settings.SITE_URL
 site_login_url = settings.SITE_LOGIN_URL
 
-def trigger_send(mail_subject, html_message, plain_message, user):
+def trigger_send(mail_subject, html_message, plain_message, user, inapp=False):
+  if not settings.SEND_MAIL and inapp:
+    print("Mail sending is disabled")
+    return
+
   send_mail(mail_subject, plain_message, sender_email, [user.email],
         html_message=html_message)
 
@@ -50,6 +54,18 @@ def send_user_password_changed_notification(user_id):
   })
   plain_message = strip_tags(html_message)
   trigger_send(mail_subject, html_message, plain_message, user)
+
+def send_member_credentials_email(created_by, user_id, password):
+  user = User.objects.get(pk=user_id)
+
+  mail_subject = 'Welcome to Abra as a member'
+  html_message = render_to_string('emails/member-registered.html', {
+    'user': user,
+    'password': password,
+    'created_by': created_by,
+  })
+  plain_message = strip_tags(html_message)
+  trigger_send(mail_subject, html_message, plain_message, user, inapp=True)
     
 def send_user_account_deleted_notification(user_id):
   user = User.objects.get(pk=user_id)
@@ -61,6 +77,20 @@ def send_user_account_deleted_notification(user_id):
   })
   plain_message = strip_tags(html_message)
   trigger_send(mail_subject, html_message, plain_message, user)
+
+
+def send_user_collection_completed_notification(user_id, collection):
+  user = User.objects.get(pk=user_id)
+
+  mail_subject = f'Collection Completed {collection.title} | Abra'
+  html_message = render_to_string('emails/collection-completed.html', {
+    'user': user,
+    'admin': user.created_by,
+    'collection': collection,
+    'date_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+  })
+  plain_message = strip_tags(html_message)
+  trigger_send(mail_subject, html_message, plain_message, user.created_by, inapp=True)
     
 def send_user_account_exam_scheduled_notification(user_id, exam, rescheduled=False):
   user = User.objects.get(pk=user_id)
@@ -79,11 +109,13 @@ def send_user_account_exam_scheduled_notification(user_id, exam, rescheduled=Fal
     'rescheduled': rescheduled
   })
   plain_message = strip_tags(html_message)
-  trigger_send(mail_subject, html_message, plain_message, user)
+  trigger_send(mail_subject, html_message, plain_message, user, inapp=True)
     
 def register_all():
   mailer.register('send_user_verification_email', send_user_verification_email)
   mailer.register('send_user_password_reset_email', send_user_password_reset_email)
   mailer.register('send_user_password_changed_notification', send_user_password_changed_notification)
   mailer.register('send_user_account_deleted_notification', send_user_account_deleted_notification)
+  mailer.register('send_member_credentials_email', send_member_credentials_email)
+  mailer.register('send_user_collection_completed_notification', send_user_collection_completed_notification)
   mailer.register('send_user_account_exam_scheduled_notification', send_user_account_exam_scheduled_notification)

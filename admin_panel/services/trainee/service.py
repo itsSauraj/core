@@ -9,6 +9,7 @@ from admin_panel.services.course.dependencies import get_course_duration
 from admin_panel.services.course.serializer import ResponseReportModuleSerializer
 from admin_panel.services.user.service import UserAPIService
 from admin_panel.services.notification.service import NotificationService
+from admin_panel.services.mailer.factory import mailer
 
 
 class TraineeCourseServices:
@@ -120,6 +121,12 @@ class TraineeCourseServices:
             .format(request.user.first_name, request.user.last_name, 
                     current_course_collection.first().collection.title),
           notification_type='success'
+        )
+
+        mailer.send_mail(
+          'send_user_collection_completed_notification',
+          user_id=request.user.id,
+          collection=current_course_collection.first().collection
         )
 
     return user_course_progress
