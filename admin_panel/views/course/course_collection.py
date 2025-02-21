@@ -10,7 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from admin_panel.roles_and_permissions.roles import IsInGroup
 from admin_panel.roles_and_permissions.decorators import group_required
 
-from admin_panel.services.course.serializer import CreateRequestCourseGroupSerializer, ResponseCourseGroupSerializer
+from admin_panel.services.course.serializer import CreateRequestCourseGroupSerializer, \
+  UpdateRequestCourseGroupSerializer, ResponseCourseGroupSerializer
 from admin_panel.services.course.course_collection import CourseCollectionAPIService
 
 
@@ -66,7 +67,7 @@ class CourseCollectionAPIView(APIView):
       course_collection = CourseCollectionAPIService.get(request.user, collection_id)
       if not course_collection:
         return Response({"message": "Course not found"}, status=404)
-      serializer = CreateRequestCourseGroupSerializer(course_collection, data=request.data, partial=True)
+      serializer = UpdateRequestCourseGroupSerializer(course_collection, data=request.data, partial=True)
 
       if 'courses' in request.data:
         courses_data = json.loads(request.data.get('courses'))

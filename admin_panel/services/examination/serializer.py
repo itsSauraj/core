@@ -2,10 +2,7 @@ import datetime
 
 from rest_framework import serializers
 
-from admin_panel.models import (
-  Course, CourseModules, CourseModuleLessons,
-  UserCourseActivity, CourseCollection, User, ScheduledExam
-)
+from admin_panel.models import ScheduledExam
 
 class ExamScheduleSerializer(serializers.ModelSerializer):
   class Meta:
@@ -79,7 +76,9 @@ class ResponseExamScheduleSerializer(serializers.ModelSerializer):
   def get_exam_details(self, obj):
     if self.context.get('trainee'):
       current_date = datetime.datetime.now(tz=datetime.timezone.utc)
-      if obj.exam_date < current_date:
-        return ""
+      current_time  = datetime.datetime.today().time()
+      if obj.exam_date > current_date:
+        if obj.exam_time > current_time:
+          return ""
       return obj.exam_details
     return obj.exam_details
